@@ -1,5 +1,6 @@
 import streamlit as st
-import pandas as pd  # Assuming you have pandas for data manipulation
+import pandas as pd
+from Assignment import get_recommendations
 
 # Assuming you have your get_recommendations function defined
 

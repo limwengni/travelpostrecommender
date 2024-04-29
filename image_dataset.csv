@@ -1,0 +1,28 @@
+image_id,image_title,hashtag,location,image_url
+1,Pulau Aur,beach vacations,Johor,images/aur.jpg
+2,Kung Pao,foodie adventure,Johor,images/johorfood.jpg
+3,Johor Bahru City,city exploration,Johor,images/johorcity.jpg
+4,Pulau Sibu,beach vacations,Johor,images/sibu.jpg
+5,Wat Koh Wanararm,cultural tours,Kedah,images/watkohwanararm.jpg
+6,Pulau Langkawi,beach vacations,Kedah,images/langkawi.jpg
+7,Pantai Cahaya Bulan,beach vacations,Kelantan,images/pantaicahayabulan.jpg
+8,Nasi Ulam Kampung,foodie adventure,Kelantan,images/kelantanfood.jpg
+9,St. Paul Church,cultural tours,Melaka,images/stpaulchurch.jpg
+10,Jonker Street,foodie adventure,Melaka,images/jonkerstreet.jpg
+11,Bukit Batu Putih,hiking,Negeri Sembilan,images/bukitbatuputih.jpg
+12,Masak Lemak Cili Api,foodie adventure,Negeri Sembilan,images/masaklemakciliapi.jpg
+13,Pahang City,city exploration,Pahang,images/pahangcity.jpg
+14,Concubine Lane,city exploration,Perak,images/perakstreet.jpg
+15,Chee Cheong Fun,foodie adventure,Perak,images/cheecheongfun.jpg
+16,Leaning Tower of Teluk Intan,cultural tours,Perak,images/leaningtower.jpg
+17,Wang Gunung,hiking,Perlis,images/wanggunung.jpg
+18,Al Hussain Mosque (Floating Mosque),cultural tours,Perlis,images/floatingmosque.jpg
+19,Komtar,city exploration,Penang,images/komtar.jpg
+20,Gurney Drive,foodie adventure,Penang,images/gurneydrive.jpg
+21,Manukan Island,beach vacations,Sabah,images/manukanisland.jpg
+22,Kota Kinabalu,hiking,Sabah,images/kinabalu.jpg
+23,Mount Santubong,hiking,Sarawak,images/santubong.jpg
+24,Gunung Serapi,hiking,Sarawak,images/serapi.jpg
+25,Batu Caves,cultural tours,Selangor,images/batucaves.jpg
+26,Islamic Civilization Park,cultural tours,Terengganu,images/islamicpark.png
+27,Pulau Redang,beach vacations,Terengganu,images/redang.jpg

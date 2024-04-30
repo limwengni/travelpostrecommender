@@ -41,11 +41,11 @@ def get_recommendations(location, hashtags_str):
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 
-# Function to convert image to base64 format
-def image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    return buffered.getvalue().encode("base64").decode('utf-8')
+# # Function to convert image to base64 format
+# def image_to_base64(image):
+#     buffered = BytesIO()
+#     image.save(buffered, format="JPEG")
+#     return buffered.getvalue().encode("base64").decode('utf-8')
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)

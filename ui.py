@@ -52,7 +52,7 @@ def image_to_base64(image):
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
-    if recommendations:
+   if recommendations:
     st.subheader("Recommendations:")
     for recommendation in recommendations:
         image_url = recommendation['image_url']

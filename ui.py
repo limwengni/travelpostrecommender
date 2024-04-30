@@ -13,13 +13,6 @@ st.title("Travel Recommendation App")
 location = st.text_input("Enter Location:")
 hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
 
-# Handle URL input (optional):
-# if st.button("Submit URL"):
-#    # Code to extract location and hashtags from URL (replace with your logic)
-#    location = "..."  # Extracted location
-#    hashtags_str = "..."  # Extracted hashtags
-
-@st.cache(suppress_st_warning=True)
 # Call the recommendation function
 def get_recommendations(location, hashtags_str):
     travel = pd.read_csv("image_dataset.csv")
@@ -50,29 +43,25 @@ base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
-    if not recommendations:
-  st.write("No recommendations found based on your input.")
-else:
-
-  @st.cache(suppress_st_warning=True)
-  def display_recommendation(recommendation, image_url):
-    try:
-      response = requests.get(image_url)
-      img = Image.open(BytesIO(response.content))
-      st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-      st.image(img, width=250)
-    except Exception as e:
-      st.write(f"Error loading image from URL: {image_url}")
-      st.write(e)
-
-  st.subheader("Recommendations:")
-  num_recommendations = len(recommendations)
-  num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-  for i in range(num_rows):
-    for j in range(3):
-      index = i * 3 + j
-      if index < num_recommendations:
-        recommendation = recommendations[index]
-        image_url = recommendation['image_url']
-        # Call cached function
-        display_recommendation(recommendation, image_url)
+    if recommendations:
+        st.subheader("Recommendations:")
+        num_recommendations = len(recommendations)
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
+        for i in range(num_rows):
+            col1, col2, col3 = st.beta_columns(3)  # Create three columns for images
+            for j in range(3):
+                index = i * 3 + j
+                if index < num_recommendations:
+                    recommendation = recommendations[index]
+                    image_url = recommendation['image_url']
+                    try:
+                        response = requests.get(image_url)
+                        img = Image.open(BytesIO(response.content))
+                        with col1, col2, col3:
+                            st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+                            st.image(img, width=250)
+                    except Exception as e:
+                        st.write(f"Error loading image from URL: {image_url}")
+                        st.write(e)
+    else:
+        st.write("No recommendations found based on your input.")

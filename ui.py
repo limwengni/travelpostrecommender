@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -36,7 +35,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -55,44 +54,22 @@ if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-        for i in range(num_rows):
-            row_html = "<div style='display:flex;'>"
-            for j in range(3):
-                index = i * 3 + j
-                if index < num_recommendations:
-                    recommendation = recommendations[index]
-                    # Display the image from GitHub repository using the provided URL
-                    image_url = recommendation['image_url']
-                    # Modify the URL to the correct format
-                    full_image_url = f"{base_github_url}/{image_url}"
-                    # Change the URL to view raw content
-                    full_image_url = full_image_url.replace("/blob/", "/raw/")
-                    try:
-                        response = requests.get(full_image_url)
-                        img = Image.open(BytesIO(response.content))
-                        # Get image dimensions
-                        width, height = img.size
-                        # Calculate padding to make the image square
-                        padding = abs(width - height) // 2
-                        # Add padding to the shorter side
-                        if width < height:
-                            img = img.crop((0, padding, width, height - padding))
-                        else:
-                            img = img.crop((padding, 0, width - padding, height))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
-                        # Convert the image to base64
-                        img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image
-                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
-                        row_html += img_html
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {full_image_url}")
-                        st.write(e)
-            row_html += "</div>"
-            st.write(row_html, unsafe_allow_html=True)
+        for recommendation in recommendations:
+            try:
+                # Display the image from GitHub repository using the provided URL
+                image_url = recommendation['image_url']
+                # Modify the URL to the correct format
+                full_image_url = f"{base_github_url}/{image_url}"
+                # Change the URL to view raw content
+                full_image_url = full_image_url.replace("/blob/", "/raw/")
+                response = requests.get(full_image_url)
+                img = Image.open(BytesIO(response.content))
+                # Display image with expander for pop-up effect
+                with st.expander(f"Click to view details: {recommendation['image_title']}"):
+                    st.image(img, caption=f"Location: {recommendation['location']}, Hashtag: {recommendation['hashtag']}")
+            except Exception as e:
+                st.write(f"Error loading image from URL: {full_image_url}")
+                st.write(e)
     else:
         st.write("No recommendations found based on your input.")
 

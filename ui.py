@@ -53,7 +53,7 @@ if st.button("Recommend"):
         num_columns = 2
         num_rows = -(-num_recommendations // num_columns)  # Ceiling division to calculate number of rows needed
         for i in range(num_rows):
-            cols = st.beta_columns(num_columns)
+            st.write("<div style='display:flex;'>", unsafe_allow_html=True)
             for j in range(num_columns):
                 index = i * num_columns + j
                 if index < num_recommendations:
@@ -68,11 +68,11 @@ if st.button("Recommend"):
                         response = requests.get(full_image_url)
                         img = Image.open(BytesIO(response.content))
                         # Display image with expander for pop-up effect
-                        with cols[j].expander(f"Click to view details: {recommendation['image_title']}"):
-                            cols[j].image(img, caption=f"Location: {recommendation['location']}, Hashtag: {recommendation['hashtag']}")
+                        st.write(f"<div style='margin-right:10px; margin-bottom: 10px;'><img src='data:image/jpeg;base64,{base64.b64encode(response.content).decode()}' style='width:250px; height:250px;'/><div>Location: {recommendation['location']}</div><div>Hashtag: {recommendation['hashtag']}</div></div>", unsafe_allow_html=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
+            st.write("</div>", unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 

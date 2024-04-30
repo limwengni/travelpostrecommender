@@ -50,6 +50,7 @@ if st.button("Recommend"):
                 # Construct the full URL by appending the relative image path to the base URL
                 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
                 full_image_url = f"{base_github_url}/{image_url}"
+                print("Full image URL:", full_image_url)
                 response = requests.get(full_image_url)
                 print("Response status code:", response.status_code)
                 print("Response content type:", response.headers['Content-Type'])

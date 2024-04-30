@@ -50,24 +50,31 @@ base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
-        st.subheader("Recommendations:")
-        num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-        for i in range(num_rows):
-            col1, col2, col3 = st.beta_columns(3)  # Create three columns for images
-            for j in range(3):
-                index = i * 3 + j
-                if index < num_recommendations:
-                    recommendation = recommendations[index]
-                    image_url = recommendation['image_url']
-                    try:
-                        response = requests.get(image_url)
-                        img = Image.open(BytesIO(response.content))
-                        with col1, col2, col3:
-                            st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-                            st.image(img, width=250)
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {image_url}")
-                        st.write(e)
+  st.subheader("Recommendations:")
+  num_recommendations = len(recommendations)
+  num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
+  col1_list, col2_list, col3_list = [], [], []
+  for i in range(num_rows):
+    for j in range(3):
+      col1_list.append(st.empty())
+      col2_list.append(st.empty())
+      col3_list.append(st.empty())
+
+  for i in range(num_rows):
+    for j in range(3):
+      index = i * 3 + j
+      if index < num_recommendations:
+        recommendation = recommendations[index]
+        image_url = recommendation['image_url']
+        try:
+          response = requests.get(image_url)
+          img = Image.open(BytesIO(response.content))
+          # Fill placeholders with content
+          if j == 0:
+            col1_list[i].write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+          col2_list[i].image(img, width=250)
+        except Exception as e:
+          col1_list[i].write(f"Error loading image from URL: {image_url}")
+          col1_list[i].write(e)
     else:
         st.write("No recommendations found based on your input.")

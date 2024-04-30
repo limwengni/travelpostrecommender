@@ -35,14 +35,19 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            if 'image_title' in sorted_df.columns:  # Check if 'title' column exists
-                recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
-            else:
-                recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
             return recommendations
     return []
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+
+def image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    # Encode the bytes object to base64
+    encoded_img = base64.b64encode(buffered.getvalue())
+    # Convert the encoded bytes to a string
+    return encoded_img.decode('utf-8')
 
 # Call the recommendation function
 if st.button("Recommend"):
@@ -67,8 +72,22 @@ if st.button("Recommend"):
                         full_image_url = full_image_url.replace("/blob/", "/raw/")
                         response = requests.get(full_image_url)
                         img = Image.open(BytesIO(response.content))
-                        # Display image with expander for pop-up effect
-                        st.write(f"<div style='margin-right:10px; margin-bottom: 10px;'><img src='data:image/jpeg;base64,{base64.b64encode(response.content).decode()}' style='width:250px; height:250px;'/><div>Location: {recommendation['location']}</div><div>Hashtag: {recommendation['hashtag']}</div></div>", unsafe_allow_html=True)
+                        # Get image dimensions
+                        width, height = img.size
+                        # Calculate padding to make the image square
+                        padding = abs(width - height) // 2
+                        # Add padding to the shorter side
+                        if width < height:
+                            img = img.crop((0, padding, width, height - padding))
+                        else:
+                            img = img.crop((padding, 0, width - padding, height))
+                        # Resize the image to 250x250
+                        img = img.resize((250, 250))
+                        # Convert the image to base64
+                        img_base64 = image_to_base64(img)
+                        # Create HTML for displaying image
+                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
+                        row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

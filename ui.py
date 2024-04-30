@@ -90,7 +90,6 @@ if st.button("Recommend"):
             <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
                 <h3>Title: ${image_title}</h3>
                 <p>Location: ${location}</p>
-                <p>Hashtag: ${hashtag}</p>
                 <img src="data:image/png;base64,${image}" style="max-width: 100%; max-height: 300px;">
                 <button onclick="closeModal()">Close</button>
             </div>

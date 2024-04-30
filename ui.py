@@ -55,7 +55,7 @@ if st.button("Recommend"):
     if recommendations:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_columns = 2
+        num_columns = 3
         num_rows = -(-num_recommendations // num_columns)  # Ceiling division to calculate number of rows needed
         for i in range(num_rows):
             st.write("<div style='display:flex;'>", unsafe_allow_html=True)

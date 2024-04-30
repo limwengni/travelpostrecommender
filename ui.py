@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 from PIL import Image
-from io import BytesIO
+import io
 
 # Assuming you have your get_recommendations function defined
 
@@ -58,12 +58,16 @@ if st.button("Recommend"):
                         base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
                         full_image_url = f"{base_github_url}/{image_url}"
                         response = requests.get(full_image_url)
-                        img = Image.open(BytesIO(response.content))
-                        # Display image with pop-up effect on click
-                        if col.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True):
-                            # Display additional details when image is clicked
-                            st.write(f"Location: {recommendation['location']}")
-                            st.write(f"Hashtag: {recommendation['hashtag']}")
+                        if response.status_code == 200:
+                            # Load the image directly from the response content
+                            img = Image.open(io.BytesIO(response.content))
+                            # Display image with pop-up effect on click
+                            if col.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True):
+                                # Display additional details when image is clicked
+                                st.write(f"Location: {recommendation['location']}")
+                                st.write(f"Hashtag: {recommendation['hashtag']}")
+                        else:
+                            st.write(f"Failed to fetch image from URL: {full_image_url}")
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

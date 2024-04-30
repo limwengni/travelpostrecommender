@@ -86,7 +86,7 @@ if st.button("Recommend"):
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image with image_title, location, and hashtag
                         img_html = f"""
-                        <div style="text-align:center;">
+                        <div style="text-align:center; margin-right: 20px;">
                             <p style="font-weight:bold;">{recommendation['image_title']}</p>
                             <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
                             <p>Location: {recommendation['location']}</p>
@@ -98,7 +98,7 @@ if st.button("Recommend"):
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
             row_html += "</div>"
-            st.html(row_html)
+            st.write(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 

@@ -46,9 +46,8 @@ base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 def image_to_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
-    # Decode the bytes object before encoding as base64
-    buffered_decoded = buffered.getvalue().decode('utf-8')
-    return buffered_decoded.encode("base64").decode('utf-8')
+    # Directly encode the bytes object to base64 (no decoding needed)
+    return buffered.getvalue().encode("base64").decode('utf-8')
 
 
 # Call the recommendation function

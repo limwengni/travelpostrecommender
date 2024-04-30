@@ -4,15 +4,20 @@ import pickle
 import requests
 from PIL import Image
 from io import BytesIO
-import base64
 
 # Assuming you have your get_recommendations function defined
 
 st.title("Travel Recommendation App")
 
 # Get user input for location and hashtags (combined string)
-location = st.text_input("Enter Location:")
+location = st.text_input("Enter Location (Optional):")
 hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
+
+# Handle URL input (optional):
+# if st.button("Submit URL"):
+#    # Code to extract location and hashtags from URL (replace with your logic)
+#    location = "..."  # Extracted location
+#    hashtags_str = "..."  # Extracted hashtags
 
 # Call the recommendation function
 def get_recommendations(location, hashtags_str):
@@ -41,59 +46,26 @@ def get_recommendations(location, hashtags_str):
     return []
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
-
-def image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    # Encode the bytes object to base64
-    encoded_img = base64.b64encode(buffered.getvalue())
-    # Convert the encoded bytes to a string
-    return encoded_img.decode('utf-8')
-
-# Call the recommendation function
 if st.button("Recommend"):
+    # Print recommendations if any
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-        for i in range(num_rows):
-            row_html = "<div style='display:flex;'>"
-            for j in range(3):
-                index = i * 3 + j
-                if index < num_recommendations:
-                    recommendation = recommendations[index]
-                    # Display the image from GitHub repository using the provided URL
-                    image_url = recommendation['image_url']
-                    # Modify the URL to the correct format
-                    full_image_url = f"{base_github_url}/{image_url}"
-                    # Change the URL to view raw content
-                    full_image_url = full_image_url.replace("/blob/", "/raw/")
-                    try:
-                        response = requests.get(full_image_url)
-                        img = Image.open(BytesIO(response.content))
-                        # Get image dimensions
-                        width, height = img.size
-                        # Calculate padding to make the image square
-                        padding = abs(width - height) // 2
-                        # Add padding to the shorter side
-                        if width < height:
-                            img = img.crop((0, padding, width, height - padding))
-                        else:
-                            img = img.crop((padding, 0, width - padding, height))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
-                        # Convert the image to base64
-                        img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image
-                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
-                        row_html += img_html
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {full_image_url}")
-                        st.write(e)
-            row_html += "</div>"
-            st.write(row_html, unsafe_allow_html=True)
+        for recommendation in recommendations:
+            st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+            # Display the image from GitHub repository using the provided URL
+            image_url = recommendation['image_url']
+            # Modify the URL to the correct format
+            full_image_url = f"{base_github_url}/{image_url}"
+            # Change the URL to view raw content
+            full_image_url = full_image_url.replace("/blob/", "/raw/")
+            try:
+                response = requests.get(full_image_url)
+                img = Image.open(BytesIO(response.content))
+                st.image(img, width=250)
+            except Exception as e:
+                st.write(f"Error loading image from URL: {full_image_url}")
+                st.write(e)
     else:
         st.write("No recommendations found based on your input.")
-
 st.stop()

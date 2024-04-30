@@ -76,7 +76,7 @@ if st.button("Recommend"):
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image
-                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; margin-right:10px;">'
+                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px;">'
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")

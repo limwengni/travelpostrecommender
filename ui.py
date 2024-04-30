@@ -124,7 +124,7 @@ if st.button("Recommend"):
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
             row_html += "</div>"
-            st.markdown(row_html, unsafe_allow_html=True)
+            st.write(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 

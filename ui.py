@@ -86,7 +86,7 @@ if st.button("Recommend"):
     modal.style.alignItems = 'center';
     modal.style.justifyContent = 'center';
     modal.style.zIndex = '9999';
-    modal.innerHTML = `
+    modal.innerHTML = f"""
   <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
     <h3>Title: ${image_title}</h3>
     <p>Location: ${location}</p>
@@ -94,7 +94,7 @@ if st.button("Recommend"):
     <img src="data:image/png;base64,${image}" style="max-width: 100%; max-height: 300px;">
     <button onclick="closeModal()">Close</button>
   </div>
-`;
+""";
 document.body.appendChild(modal);
 function closeModal() {
   document.body.removeChild(modal);

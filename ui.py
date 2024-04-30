@@ -34,6 +34,9 @@ def get_recommendations(location, hashtags_str):
             )
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
+            # Print out sorted_df for inspection
+            print("Sorted DataFrame:")
+            print(sorted_df)
             # Get top 10 recommendations
             recommendations = sorted_df[['title', 'location', 'hashtag', 'image_url']].head(10).to_dict('records')
             return recommendations

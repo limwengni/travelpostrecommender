@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -35,7 +36,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -48,31 +49,6 @@ def image_to_base64(image):
     encoded_img = base64.b64encode(buffered.getvalue())
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
-
-# JavaScript for modal popup
-modal_script = """
-<script>
-    function showModal(title, full_image, location, hashtag) {
-        const modal = document.createElement('div');
-        modal.innerHTML = `
-            <div style="background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center; z-index: 999;">
-                <div style="background-color: white; padding: 20px; border-radius: 5px; max-width: 80%; max-height: 80%; overflow-y: auto;">
-                    <h2>${title}</h2>
-                    <img src="${full_image}" style="max-width: 100%; max-height: 60vh; margin-bottom: 20px;">
-                    <p><strong>Location:</strong> ${location}</p>
-                    <p><strong>Hashtag:</strong> ${hashtag}</p>
-                    <button onclick="closeModal()">Close</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    }
-
-    function closeModal() {
-        document.querySelector('div[role="dialog"]').remove();
-    }
-</script>
-"""
 
 # Call the recommendation function
 if st.button("Recommend"):
@@ -109,16 +85,8 @@ if st.button("Recommend"):
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
-                        # Access recommendation details
-                        img_location = recommendation['location']
-                        img_hashtag = recommendation['hashtag']
-                        img_title = recommendation['image_title']
-                        # Construct HTML for displaying image with details and JavaScript to open modal popup
-                        img_html = f"""
-                          <img src="data:image/jpeg;base64,{img_base64}" 
-                               style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px; cursor: pointer;"
-                               onclick="showModal('{img_title}', '{full_image_url}', '{img_location}', '#{img_hashtag}')">
-                        """
+                        # Create HTML for displaying image
+                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
@@ -128,5 +96,4 @@ if st.button("Recommend"):
     else:
         st.write("No recommendations found based on your input.")
 
-# Display the JavaScript for modal popup
-st.markdown(modal_script, unsafe_allow_html=True)
+st.stop()

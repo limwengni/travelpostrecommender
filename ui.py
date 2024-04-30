@@ -4,6 +4,7 @@ import pickle
 import requests
 from PIL import Image
 from io import BytesIO
+import base64
 
 # Assuming you have your get_recommendations function defined
 
@@ -41,13 +42,13 @@ def get_recommendations(location, hashtags_str):
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 
-
-# Function to convert image to base64 format (corrected)
 def image_to_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
-    # Directly encode the bytes object to base64 (no decoding needed)
-    return buffered.getvalue().encode("base64").decode('utf-8')
+    # Encode the bytes object to base64
+    encoded_img = base64.b64encode(buffered.getvalue())
+    # Convert the encoded bytes to a string
+    return encoded_img.decode('utf-8')
 
 
 # Call the recommendation function

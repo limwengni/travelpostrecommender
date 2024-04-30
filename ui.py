@@ -95,7 +95,7 @@ if st.button("Recommend"):
                               <p>{img_location}</p>
                               <p style="font-weight:bold;">Hashtag:</p>
                               <div style="border: 1px solid black; padding: 5px; display: inline-block;">
-                                <p style="margin: 0;">#{img_hashtag}</p>
+                                <p style="margin: 0;">{img_hashtag}</p>
                               </div>
                           </div>
                           """

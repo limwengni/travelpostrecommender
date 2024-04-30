@@ -73,6 +73,17 @@ if st.button("Recommend"):
                     try:
                         response = requests.get(full_image_url)
                         img = Image.open(BytesIO(response.content))
+                        # Get image dimensions
+                        width, height = img.size
+                        # Calculate padding to make the image square
+                        padding = abs(width - height) // 2
+                        # Add padding to the shorter side
+                        if width < height:
+                            img = img.crop((0, padding, width, height - padding))
+                        else:
+                            img = img.crop((padding, 0, width - padding, height))
+                        # Resize the image to 250x250
+                        img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image

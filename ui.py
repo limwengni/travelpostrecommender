@@ -82,8 +82,8 @@ if st.button("Recommend"):
                             img = img.crop((0, padding, width, height - padding))
                         else:
                             img = img.crop((padding, 0, width - padding, height))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
+                        # Resize the image to 250x250 with LANCZOS filter for better quality
+                        img = img.resize((250, 250), Image.LANCZOS)
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image
@@ -96,4 +96,5 @@ if st.button("Recommend"):
             st.write(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
+
 st.stop()

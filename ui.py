@@ -4,15 +4,20 @@ import pickle
 import requests
 from PIL import Image
 from io import BytesIO
-import base64
 
 # Assuming you have your get_recommendations function defined
 
 st.title("Travel Recommendation App")
 
 # Get user input for location and hashtags (combined string)
-location = st.text_input("Enter Location:")
+location = st.text_input("Enter Location (Optional):")
 hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
+
+# Handle URL input (optional):
+# if st.button("Submit URL"):
+#    # Code to extract location and hashtags from URL (replace with your logic)
+#    location = "..."  # Extracted location
+#    hashtags_str = "..."  # Extracted hashtags
 
 # Call the recommendation function
 def get_recommendations(location, hashtags_str):
@@ -36,45 +41,31 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            if 'image_title' in sorted_df.columns:  # Check if 'title' column exists
-                recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
-            else:
-                recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
             return recommendations
     return []
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
-
-def image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    # Encode the bytes object to base64
-    encoded_img = base64.b64encode(buffered.getvalue())
-    # Convert the encoded bytes to a string
-    return encoded_img.decode('utf-8')
-
-# Call the recommendation function
 if st.button("Recommend"):
+    # Print recommendations if any
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        for i, recommendation in enumerate(recommendations):
+        for recommendation in recommendations:
+            st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+            # Display the image from GitHub repository using the provided URL
+            image_url = recommendation['image_url']
+            # Modify the URL to the correct format
+            full_image_url = f"{base_github_url}/{image_url}"
+            # Change the URL to view raw content
+            full_image_url = full_image_url.replace("/blob/", "/raw/")
             try:
-                # Display the image from GitHub repository using the provided URL
-                image_url = recommendation['image_url']
-                # Modify the URL to the correct format
-                full_image_url = f"{base_github_url}/{image_url}"
-                # Change the URL to view raw content
-                full_image_url = full_image_url.replace("/blob/", "/raw/")
                 response = requests.get(full_image_url)
                 img = Image.open(BytesIO(response.content))
-                # Display image with expander for pop-up effect
-                with st.expander(f"Click to view details: {recommendation['image_title']}"):
-                    st.image(img, caption=f"Location: {recommendation['location']}, Hashtag: {recommendation['hashtag']}")
+                st.image(img, width=250)
             except Exception as e:
                 st.write(f"Error loading image from URL: {full_image_url}")
                 st.write(e)
     else:
         st.write("No recommendations found based on your input.")
-
 st.stop()

@@ -36,8 +36,8 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            if 'title' in sorted_df.columns:  # Check if 'title' column exists
-                recommendations = sorted_df[['location', 'hashtag', 'image_url', 'title']].head(10).to_dict('records')
+            if 'image_title' in sorted_df.columns:  # Check if 'title' column exists
+                recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             else:
                 recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
             return recommendations
@@ -69,7 +69,7 @@ if st.button("Recommend"):
                 response = requests.get(full_image_url)
                 img = Image.open(BytesIO(response.content))
                 # Display image with expander for pop-up effect
-                with st.expander(f"Click to view details: {recommendation['title']}"):
+                with st.expander(f"Click to view details: {recommendation['image_title']}"):
                     st.image(img, caption=f"Location: {recommendation['location']}, Hashtag: {recommendation['hashtag']}")
             except Exception as e:
                 st.write(f"Error loading image from URL: {full_image_url}")

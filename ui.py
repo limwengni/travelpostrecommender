@@ -34,12 +34,13 @@ def get_recommendations(location, hashtags_str):
             )
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
-            # Get top 10 recommendations
+            # Get top 10 recommendations, including image title
             recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+
 
 # Call the recommendation function
 if st.button("Recommend"):
@@ -64,43 +65,49 @@ if st.button("Recommend"):
                 img_pil.save(img_byte_arr, format="PNG")
                 img_base64_encoded = base64.b64encode(img_byte_arr.getvalue()).decode()
 
+                # Access the image title from the recommendation dictionary
+                image_title = recommendation['image_title']
+
                 # Create HTML to display image with details in a pop-up on click
                 html_code = f"""
-                <div onclick="showDetails('{recommendation['image_title']}', '{recommendation['location']}', '{recommendation['hashtag']}', '{img_base64_encoded}')" style="cursor: pointer;">
-                    <img src="data:image/png;base64,{img_base64_encoded}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
-                </div>
-                <script>
-                    function showDetails(title, location, hashtag, image) {{
-                        var modal = document.createElement('div');
-                        modal.style.position = 'fixed';
-                        modal.style.top = '0';
-                        modal.style.left = '0';
-                        modal.style.width = '100%';
-                        modal.style.height = '100%';
-                        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-                        modal.style.display = 'flex';
-                        modal.style.alignItems = 'center';
-                        modal.style.justifyContent = 'center';
-                        modal.style.zIndex = '9999';
-                        modal.innerHTML = `
-                            <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
-                                <h3>Title: ${title}</h3>
-                                <p>Location: ${location}</p>
-                                <p>Hashtag: ${hashtag}</p>
-                                <img src="data:image/png;base64,${image}" style="max-width: 100%; max-height: 300px;">
-                                <button onclick="closeModal()">Close</button>
-                            </div>
-                        `;
-                        document.body.appendChild(modal);
-                        function closeModal() {{
-                            document.body.removeChild(modal);
-                        }}
-                    }}
-                </script>
-                """
+<div onclick="showDetails('{image_title}', '{recommendation['location']}', '{recommendation['hashtag']}', '{img_base64_encoded}')" style="cursor: pointer;">
+  <img src="data:image/png;base64,{img_base64_encoded}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
+</div>
+<script>
+  function showDetails(image_title, location, hashtag, image) {{
+    var modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    modal.style.zIndex = '9999';
+    modal.innerHTML = `
+  <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
+    <h3>Title: ${image_title}</h3>
+    <p>Location: ${location}</p>
+    <p>Hashtag: ${hashtag}</p>
+    <img src="data:image/png;base64,${image}" style="max-width: 100%; max-height: 300px;">
+    <button onclick="closeModal()">Close</button>
+  </div>
+`;
+document.body.appendChild(modal);
+function closeModal() {
+  document.body.removeChild(modal);
+}
+}}
+</script>
+"""
+
                 st.write(html_code, unsafe_allow_html=True)
             except Exception as e:
                 st.write(f"Error loading image from URL: {full_image_url}")
                 st.write(e)
     else:
         st.write("No recommendations found based on your input.")
+
+st.stop()

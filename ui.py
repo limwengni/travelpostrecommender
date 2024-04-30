@@ -7,10 +7,10 @@ from io import BytesIO
 
 # Assuming you have your get_recommendations function defined
 
-st.title("Travel Recommendation App Test")
+st.title("Travel Recommendation App")
 
 # Get user input for location and hashtags (combined string)
-location = st.text_input("Enter Location (Optional):")
+location = st.text_input("Enter Location:")
 hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
 
 # Handle URL input (optional):

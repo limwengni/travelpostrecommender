@@ -62,42 +62,42 @@ if st.button("Recommend"):
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
-                    recommendation = recommendations[index]
-                    # Display the image from GitHub repository using the provided URL
-                    image_url = recommendation['image_url']
-                    # Modify the URL to the correct format
-                    full_image_url = f"{base_github_url}/{image_url}"
-                    # Change the URL to view raw content
-                    full_image_url = full_image_url.replace("/blob/", "/raw/")
-                    try:
-                        response = requests.get(full_image_url)
-                        img = Image.open(BytesIO(response.content))
-                        # Get image dimensions
-                        width, height = img.size
-                        # Calculate padding to make the image square
-                        padding = abs(width - height) // 2
-                        # Add padding to the shorter side
-                        if width < height:
-                            img = img.crop((0, padding, width, height - padding))
-                        else:
-                            img = img.crop((padding, 0, width - padding, height))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
-                        # Convert the image to base64
-                        img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image
-                        img_html = f"""
-<div style="text-align:center;">
-    <p style="font-weight:bold;">{recommendation['image_title']}</p>
-    <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
-    <p>Location: {recommendation['location']}</p>
-    <p>Hashtag: #{recommendation['hashtag']}</p>
-</div>
-"""
-                        row_html += img_html
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {full_image_url}")
-                        st.write(e)
+    recommendation = recommendations[index]
+    # Display the image from GitHub repository using the provided URL
+    image_url = recommendation['image_url']
+    # Modify the URL to the correct format
+    full_image_url = f"{base_github_url}/{image_url}"
+    # Change the URL to view raw content
+    full_image_url = full_image_url.replace("/blob/", "/raw/")
+    try:
+        response = requests.get(full_image_url)
+        img = Image.open(BytesIO(response.content))
+        # Get image dimensions
+        width, height = img.size
+        # Calculate padding to make the image square
+        padding = abs(width - height) // 2
+        # Add padding to the shorter side
+        if width < height:
+            img = img.crop((0, padding, width, height - padding))
+        else:
+            img = img.crop((padding, 0, width - padding, height))
+        # Resize the image to 250x250
+        img = img.resize((250, 250))
+        # Convert the image to base64
+        img_base64 = image_to_base64(img)
+        # Create HTML for displaying image
+        img_html = f"""
+        <div style="text-align:center;">
+            <p style="font-weight:bold;">{recommendation.get('image_title', 'Title Not Available')}</p>
+            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
+            <p>Location: {recommendation.get('location', 'Location Not Available')}</p>
+            <p>Hashtag: #{recommendation.get('hashtag', 'Hashtag Not Available')}</p>
+        </div>
+        """
+        row_html += img_html
+    except Exception as e:
+        st.write(f"Error loading image from URL: {full_image_url}")
+        st.write(e)
             row_html += "</div>"
             st.write(row_html, unsafe_allow_html=True)
     else:

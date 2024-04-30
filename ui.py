@@ -85,6 +85,7 @@ if st.button("Recommend"):
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
+                        img_hashtag = recommendation['hashtag']
                         # Create HTML for displaying image
                         img_html = f"""<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
                               <p style="font-weight:bold;">Hashtag:</p>

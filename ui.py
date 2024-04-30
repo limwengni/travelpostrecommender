@@ -103,3 +103,4 @@ def showDetails(title, location, hashtag, image_url):
     st.write(f"Location: {location}")
     st.write(f"Hashtag: {hashtag}")
     st.image(image_url, use_column_width=True)
+

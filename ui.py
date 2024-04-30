@@ -53,7 +53,6 @@ def image_to_base64(image):
 # Function to create a modal for a recommendation
 def create_modal(recommendation):
     """
-    Creates an HTML structure for a modal displaying recommendation details.
 import streamlit as st
 import pandas as pd
 import pickle

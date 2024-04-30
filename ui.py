@@ -104,7 +104,7 @@ def create_modal(recommendation):
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
-        st.subheader("Recommendations:")
+                st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
 
@@ -154,3 +154,4 @@ if st.button("Recommend"):
         st.write("No recommendations found based on your input.")
 
 st.stop()
+

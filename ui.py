@@ -3,7 +3,6 @@ import pandas as pd
 import requests
 from PIL import Image
 from io import BytesIO
-import base64
 
 # Assuming you have your get_recommendations function defined
 
@@ -80,7 +79,7 @@ if st.button("Recommend"):
                     <img src="data:image/png;base64,{img_base64_encoded}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
                 </div>
                 <script>
-                    function showDetails(image_title, location, hashtag, image) {{
+                    function showDetails(title, location, hashtag, image) {{
                         var modal = document.createElement('div');
                         modal.style.position = 'fixed';
                         modal.style.top = '0';
@@ -94,7 +93,7 @@ if st.button("Recommend"):
                         modal.style.zIndex = '9999';
                         modal.innerHTML = `
                             <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
-                                <h3>Title: ${image_title}</h3>
+                                <h3>Title: ${title}</h3>
                                 <p>Location: ${location}</p>
                                 <p>Hashtag: ${hashtag}</p>
                                 <img src="data:image/png;base64,${image}" style="max-width: 100%; max-height: 300px;">

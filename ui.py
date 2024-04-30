@@ -34,7 +34,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'title']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -47,12 +47,12 @@ if st.button("Recommend"):
             try:
                 # Display the image from GitHub repository using the provided URL
                 image_url = recommendation['image_url']
-                # Modify the URL to the correct format
-                full_image_url = image_url  # Assume direct image URLs are provided
+                # Construct the full URL by appending the relative image path to the base URL
+                full_image_url = f"{base_github_url}/{image_url}"
                 response = requests.get(full_image_url)
                 img = Image.open(BytesIO(response.content))
                 # Display image with pop-up effect on click
-                if st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True):
+                if st.image(img, caption=recommendation['title'], use_column_width=True, clamp=True):
                     # Display additional details when image is clicked
                     st.write(f"Location: {recommendation['location']}")
                     st.write(f"Hashtag: {recommendation['hashtag']}")

@@ -38,57 +38,78 @@ def get_recommendations(location, hashtags_str):
             return recommendations
     return []
 
-# Function to display details in popout when image is clicked
-def show_details(recommendation):
-    st.write(f"Title: {recommendation['image_title']}")
-    st.write(f"Location: {recommendation['location']}")
-    st.write(f"Hashtag: {recommendation['hashtag']}")
-
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-        for i in range(num_rows):
-            row_html = "<div style='display:flex;'>"
-            for j in range(3):
-                index = i * 3 + j
-                if index < num_recommendations:
-                    recommendation = recommendations[index]
-                    # Display the image from GitHub repository using the provided URL
-                    image_url = recommendation['image_url']
-                    # Modify the URL to the correct format
-                    base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
-                    full_image_url = f"{base_github_url}/{image_url}"
-                    # Change the URL to view raw content
-                    full_image_url = full_image_url.replace("/blob/", "/raw/")
-                    try:
-                        response = requests.get(full_image_url)
-                        img = Image.open(BytesIO(response.content))
-                        # Get image dimensions
-                        width, height = img.size
-                        # Calculate padding to make the image square
-                        padding = abs(width - height) // 2
-                        # Add padding to the shorter side
-                        if width < height:
-                            img = img.crop((0, padding, width, height - padding))
-                        else:
-                            img = img.crop((padding, 0, width - padding, height))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
-                        # Display image
-                        st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True)
-                        # Display button to show details when clicked
-                        if st.button("Show Details", key=f"button_{index}"):
-                            show_details(recommendation)
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {full_image_url}")
-                        st.write(e)
-            row_html += "</div>"
-            st.write(row_html, unsafe_allow_html=True)
+        for recommendation in recommendations:
+            try:
+                # Display the image from GitHub repository using the provided URL
+                image_url = recommendation['image_url']
+                # Modify the URL to the correct format
+                base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+                full_image_url = f"{base_github_url}/{image_url}"
+                # Change the URL to view raw content
+                full_image_url = full_image_url.replace("/blob/", "/raw/")
+                response = requests.get(full_image_url)
+                img = Image.open(BytesIO(response.content))
+                # Get image dimensions
+                width, height = img.size
+                # Calculate padding to make the image square
+                padding = abs(width - height) // 2
+                # Add padding to the shorter side
+                if width < height:
+                    img = img.crop((0, padding, width, height - padding))
+                else:
+                    img = img.crop((padding, 0, width - padding, height))
+                # Resize the image to 250x250
+                img = img.resize((250, 250))
+                # Convert image to base64
+                img_base64 = Image.open(BytesIO(response.content)).convert("RGBA")
+                img_pil = Image.new("RGBA", img_base64.size)
+                img_pil.paste(img_base64, (0, 0), img_base64)
+                img_byte_arr = BytesIO()
+                img_pil.save(img_byte_arr, format="PNG")
+                img_base64_encoded = base64.b64encode(img_byte_arr.getvalue()).decode()
+
+                # Create HTML to display image with details in a pop-up on click
+                html_code = f"""
+                <div onclick="showDetails('{recommendation['image_title']}', '{recommendation['location']}', '{recommendation['hashtag']}', '{img_base64_encoded}')" style="cursor: pointer;">
+                    <img src="data:image/png;base64,{img_base64_encoded}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
+                </div>
+                <script>
+                    function showDetails(title, location, hashtag, image) {{
+                        var modal = document.createElement('div');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '0';
+                        modal.style.left = '0';
+                        modal.style.width = '100%';
+                        modal.style.height = '100%';
+                        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                        modal.style.display = 'flex';
+                        modal.style.alignItems = 'center';
+                        modal.style.justifyContent = 'center';
+                        modal.style.zIndex = '9999';
+                        modal.innerHTML = `
+                            <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
+                                <h3>Title: ${title}</h3>
+                                <p>Location: ${location}</p>
+                                <p>Hashtag: ${hashtag}</p>
+                                <img src="data:image/png;base64,${image}" style="max-width: 100%; max-height: 300px;">
+                                <button onclick="closeModal()">Close</button>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                        function closeModal() {{
+                            document.body.removeChild(modal);
+                        }}
+                    }}
+                </script>
+                """
+                st.write(html_code, unsafe_allow_html=True)
+            except Exception as e:
+                st.write(f"Error loading image from URL: {full_image_url}")
+                st.write(e)
     else:
         st.write("No recommendations found based on your input.")
-
-st.stop()

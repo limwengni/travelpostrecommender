@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -36,7 +35,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -85,8 +84,18 @@ if st.button("Recommend"):
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image
-                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
+                        # Create HTML for displaying image with details
+                        img_title = recommendation['image_title']
+                        img_hashtag = recommendation['hashtag']
+                        img_location = recommendation['location']
+                        img_html = f"""
+                            <div style="margin-right:10px; margin-bottom: 10px;">
+                                <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px;">
+                                <p>Title: {img_title}</p>
+                                <p>Hashtag: {img_hashtag}</p>
+                                <p>Location: {img_location}</p>
+                            </div>
+                        """
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")

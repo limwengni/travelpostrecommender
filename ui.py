@@ -74,7 +74,7 @@ if st.button("Recommend"):
   <img src="data:image/png;base64,{img_base64_encoded}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
 </div>
 <script>
-    function showDetails(image_title, location, hashtag, image) {
+    function showDetails(image_title, location, hashtag, image) {{
         var modal = document.createElement('div');
         modal.style.position = 'fixed';
         modal.style.top = '0';
@@ -96,10 +96,10 @@ if st.button("Recommend"):
             </div>
         `;
         document.body.appendChild(modal);
-        function closeModal() {
+        function closeModal() {{
             document.body.removeChild(modal);
-        }
-    }
+        }}
+    }}
 </script>
 """
 

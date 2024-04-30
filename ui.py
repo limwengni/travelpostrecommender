@@ -53,6 +53,7 @@ if st.button("Recommend"):
                 response = requests.get(full_image_url)
                 print("Response status code:", response.status_code)
                 print("Response content type:", response.headers['Content-Type'])
+                print("Response content:", response.content)
                 img = Image.open(BytesIO(response.content))
                 # Display image with pop-up effect on click
                 if st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True):

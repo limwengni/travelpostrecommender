@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 from PIL import Image
 from io import BytesIO
+import base64
 
 # Assuming you have your get_recommendations function defined
 

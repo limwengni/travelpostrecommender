@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -36,7 +35,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -81,19 +80,26 @@ if st.button("Recommend"):
                             img = img.crop((0, padding, width, height - padding))
                         else:
                             img = img.crop((padding, 0, width - padding, height))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image
-                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
+                        # Access recommendation details
+                        img_title = recommendation['image_title']
+                        img_hashtag = recommendation['hashtag']
+                        img_location = recommendation['location']
+                        # Construct HTML for displaying image with details
+                        img_html = f"""
+                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px" 
+                            onclick="showDetails('{img_title}', '{img_location}', '{img_hashtag}', '{full_image_url}')">
+                        """
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
             row_html += "</div>"
             st.write(row_html, unsafe_allow_html=True)
-    else:
-        st.write("No recommendations found based on your input.")
 
-st.stop()
+def showDetails(title, location, hashtag, image_url):
+    st.write(f"Title: {title}")
+    st.write(f"Location: {location}")
+    st.write(f"Hashtag: {hashtag}")
+    st.image(image_url, use_column_width=True)

@@ -34,7 +34,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'title']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -52,7 +52,7 @@ if st.button("Recommend"):
                 response = requests.get(full_image_url)
                 img = Image.open(BytesIO(response.content))
                 # Display image with pop-up effect on click
-                if st.image(img, caption=recommendation['title'], use_column_width=True, clamp=True):
+                if st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True):
                     # Display additional details when image is clicked
                     st.write(f"Location: {recommendation['location']}")
                     st.write(f"Hashtag: {recommendation['hashtag']}")

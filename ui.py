@@ -64,5 +64,5 @@ if st.button("Recommend"):
                         st.write(f"Error loading image from URL: {image_url}")
                         st.write(e)
     else:
-        st.write("No recommendations found based on your input.")
+      st.write("No recommendations found based on your input.")
 st.stop()

@@ -51,6 +51,8 @@ if st.button("Recommend"):
                 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
                 full_image_url = f"{base_github_url}/{image_url}"
                 response = requests.get(full_image_url)
+                print("Response status code:", response.status_code)
+                print("Response content type:", response.headers['Content-Type'])
                 img = Image.open(BytesIO(response.content))
                 # Display image with pop-up effect on click
                 if st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True):

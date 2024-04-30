@@ -97,7 +97,7 @@ if st.button("Recommend"):
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
             row_html += "</div>"
-            st.write(row_html, unsafe_allow_html=True)
+            st.markdown(row_html, unsafe_allow_html=True)
 
 def showDetails(title, location, hashtag, image_url):
     st.write(f"Title: {title}")

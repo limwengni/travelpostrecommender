@@ -47,7 +47,7 @@ if st.button("Recommend"):
         num_rows = (num_recommendations + images_per_row - 1) // images_per_row
         for i in range(num_rows):
             row_images = recommendations[i * images_per_row: (i + 1) * images_per_row]
-            cols = st.beta_columns(images_per_row)
+            cols = st.columns(images_per_row)
             for j, col in enumerate(cols):
                 if j < len(row_images):
                     recommendation = row_images[j]

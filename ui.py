@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -14,7 +13,7 @@ st.title("Travel Recommendation App")
 location = st.text_input("Enter Location:")
 hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
 
-# Call the recommendation function
+# Define function to get recommendations
 def get_recommendations(location, hashtags_str):
     travel = pd.read_csv("image_dataset.csv")
 
@@ -27,7 +26,7 @@ def get_recommendations(location, hashtags_str):
 
     # Filter the dataframe based on location (if provided)
     if location:
-        filtered_df = travel[travel['location'] == location].copy()  # Make a copy of the filtered DataFrame
+        filtered_df = travel[travel['location'] == location].copy()
         if not filtered_df.empty:
             # Calculate hashtag similarity scores for filtered entries
             filtered_df['hashtag_sim_score'] = filtered_df['hashtag'].apply(
@@ -36,12 +35,11 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
-base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
-
+# Function to convert image to base64
 def image_to_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
@@ -85,15 +83,19 @@ if st.button("Recommend"):
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image
+                        # Access recommendation details
+                        img_title = recommendation['image_title']
+                        img_hashtag = recommendation['hashtag']
+                        img_location = recommendation['location']
+                        # Construct HTML for displaying image with details
                         img_html = f"""
-                        <div style="text-align:center;">
-                            <p style="font-weight:bold;">{recommendation.get('image_title', 'Title Not Available')}</p>
-                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
-                            <p>Location: {recommendation.get('location', 'Location Not Available')}</p>
-                            <p>Hashtag: #{recommendation.get('hashtag', 'Hashtag Not Available')}</p>
-                        </div>
-                        """
+                          <div style="text-align:center;">
+                              <p style="font-weight:bold;">{img_title}</p>
+                              <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
+                              <p>Location: {img_location}</p>
+                              <p>Hashtag: #{img_hashtag}</p>
+                          </div>
+                          """
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")

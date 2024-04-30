@@ -51,12 +51,8 @@ if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        num_cols = 3  # Adjust this based on desired number of columns in the grid
-        cols = st.beta_columns(num_cols)  # Create columns for images
-
-        for i, recommendation in enumerate(recommendations):
-            col = cols[i % num_cols]  # Assign image to the appropriate column
-            with col:
+        with st.container():  # Wrap images in a container for better layout control
+            for i, recommendation in enumerate(recommendations):
                 st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
                 # Display the image from GitHub repository using the provided URL
                 image_url = recommendation['image_url']

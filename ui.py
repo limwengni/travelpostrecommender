@@ -1,5 +1,9 @@
 import streamlit as st
 import pandas as pd
+import pickle
+import requests
+from PIL import Image
+from io import BytesIO
 
 # Assuming you have your get_recommendations function defined
 

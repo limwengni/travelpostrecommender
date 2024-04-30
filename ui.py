@@ -48,26 +48,27 @@ if st.button("Recommend"):
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            col1, col2, col3 = st.beta_columns(3)  # Create three columns for images
+            row = st.empty()  # Create an empty placeholder to display the row
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations[index]
-                    with col1, col2, col3:
-                        st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-                        # Display the image from GitHub repository using the provided URL
-                        image_url = recommendation['image_url']
-                        # Modify the URL to the correct format
-                        full_image_url = f"{base_github_url}/{image_url}"
-                        # Change the URL to view raw content
-                        full_image_url = full_image_url.replace("/blob/", "/raw/")
-                        try:
-                            response = requests.get(full_image_url)
-                            img = Image.open(BytesIO(response.content))
-                            st.image(img, width=250)
-                        except Exception as e:
-                            st.write(f"Error loading image from URL: {full_image_url}")
-                            st.write(e)
+                    # Display the image from URL
+                    image_url = recommendation['image_url']
+                    try:
+                        response = requests.get(image_url)
+                        img = Image.open(BytesIO(response.content))
+                        # Resize image to desired size (e.g., 250x250)
+                        img.thumbnail((250, 250))
+                        # Convert image to base64 format for display
+                        img_base64 = image_to_base64(img)
+                        # Display image in DataFrame
+                        st.image(img, caption=recommendation['location'], use_column_width=True)
+                    except Exception as e:
+                        st.write(f"Error loading image from URL: {image_url}")
+                        st.write(e)
+            st.write("<br>", unsafe_allow_html=True)  # Add some space between rows
+
     else:
         st.write("No recommendations found based on your input.")
 st.stop()

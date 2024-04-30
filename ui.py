@@ -47,6 +47,19 @@ def get_recommendations(location, hashtags_str):
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 # Call the recommendation function
+pass
+
+# Function to convert image to base64 format
+def image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    return b64encode(buffered.getvalue()).decode('utf-8')
+
+# Get user input for location and hashtags (combined string)
+location = st.text_input("Enter Location (Optional):")
+hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
+
+# Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
@@ -66,22 +79,14 @@ if st.button("Recommend"):
                         img = Image.open(BytesIO(response.content))
                         # Resize image to desired size (e.g., 250x250)
                         img.thumbnail((250, 250))
-                        # Convert image to HTML for displaying in DataFrame
-                        img_html = f'<img src="data:image/jpeg;base64,{Image_to_Base64(img)}" style="max-width:100%; max-height:100%;">'
-                        recommendation['Image'] = img_html
+                        # Convert image to base64 format for display
+                        img_base64 = image_to_base64(img)
+                        # Display image in DataFrame
+                        st.image(img, caption=recommendation['location'], use_column_width=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {image_url}")
                         st.write(e)
-            # Create a DataFrame for the current row and display it
-            row_df = pd.DataFrame(recommendations[i * 3:min((i + 1) * 3, num_recommendations)])
-            st.dataframe(row_df.style.hide_index(), height=300)  # Adjust height as needed
             st.write("<br>", unsafe_allow_html=True)  # Add some space between rows
 
     else:
         st.write("No recommendations found based on your input.")
-
-# Function to convert image to base64 format
-def Image_to_Base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    return b64encode(buffered.getvalue()).decode('utf-8')

@@ -49,6 +49,34 @@ def image_to_base64(image):
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
+# Custom JavaScript function to enlarge images when clicked
+def enlarge_image_on_click():
+    return """
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll(".enlarge-img").forEach(item => {
+            item.addEventListener("click", event => {
+                const imgSrc = event.target.getAttribute("src");
+                const imgTitle = event.target.getAttribute("alt");
+                const modalContent = `
+                    <div style='text-align: center;'>
+                        <img src='${imgSrc}' style='max-width: 80%; max-height: 80%;'>
+                        <p>${imgTitle}</p>
+                    </div>
+                `;
+                const modal = document.createElement("div");
+                modal.innerHTML = modalContent;
+                modal.style.cssText = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;";
+                modal.addEventListener("click", () => {
+                    modal.remove();
+                });
+                document.body.appendChild(modal);
+            });
+        });
+    });
+    </script>
+    """
+
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
@@ -57,7 +85,6 @@ if st.button("Recommend"):
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            row_html = "<div style='display:flex;'>"
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
@@ -71,34 +98,20 @@ if st.button("Recommend"):
                     try:
                         response = requests.get(full_image_url)
                         img = Image.open(BytesIO(response.content))
-                        # Get image dimensions
-                        width, height = img.size
-                        # Calculate padding to make the image square
-                        padding = abs(width - height) // 2
-                        # Add padding to the shorter side
-                        if width < height:
-                            img = img.crop((0, padding, width, height - padding))
-                        else:
-                            img = img.crop((padding, 0, width - padding, height))
                         # Resize the image to 250x250
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image with image_title, location, and hashtag
                         img_html = f"""
-                        <div style="text-align:center; margin-right: 20px;">
-                            <p style="font-weight:bold;">{recommendation['image_title']}</p>
-                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
-                            <p>Location: {recommendation['location']}</p>
-                            <p>Hashtag: #{recommendation['hashtag']}</p>
-                        </div>
+                        <img class="enlarge-img" src="data:image/jpeg;base64,{img_base64}" alt="{recommendation['image_title']}" style="width:250px; height:250px; margin-right:10px; margin-bottom:10px; cursor:pointer;">
                         """
-                        row_html += img_html
+                        st.write(img_html, unsafe_allow_html=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
-            row_html += "</div>"
-            st.html(row_html)
+        # Add JavaScript to the page to enable image enlargement on click
+        st.write(enlarge_image_on_click(), unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 

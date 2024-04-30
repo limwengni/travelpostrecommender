@@ -48,6 +48,7 @@ if st.button("Recommend"):
                 # Display the image from GitHub repository using the provided URL
                 image_url = recommendation['image_url']
                 # Construct the full URL by appending the relative image path to the base URL
+                base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
                 full_image_url = f"{base_github_url}/{image_url}"
                 response = requests.get(full_image_url)
                 img = Image.open(BytesIO(response.content))

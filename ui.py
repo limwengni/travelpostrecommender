@@ -66,7 +66,7 @@ if st.button("Recommend"):
 
                 # Create HTML to display image with details in a pop-up on click
                 # Create HTML to display image with details in a pop-up on click
-html_code = f"""
+                html_code = f"""
 <div onclick="showDetails('{recommendation['image_title']}', '{recommendation['location']}', '{recommendation['hashtag']}', '{img_base64_encoded}')" style="cursor: pointer;">
     <img src="data:image/png;base64,{img_base64_encoded}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
 </div>

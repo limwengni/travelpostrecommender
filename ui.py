@@ -51,21 +51,27 @@ if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        col1, col2, col3 = st.beta_columns(3)
-        for i, recommendation in enumerate(recommendations):
-            if i % 3 == 0:
-                col1, col2, col3 = st.beta_columns(3)
-            with col1, col2, col3:
-                st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-                # Display the image from URL
-                image_url = recommendation['image_url']
-                try:
-                    response = requests.get(image_url)
-                    img = Image.open(BytesIO(response.content))
-                    st.image(img, caption=recommendation['location'], width=250)
-                except Exception as e:
-                    st.write(f"Error loading image from URL: {image_url}")
-                    st.write(e)
+        # Display images in rows
+        num_recommendations = len(recommendations)
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
+        for i in range(num_rows):
+            col1, col2, col3 = st.beta_columns(3)
+            for j in range(3):
+                index = i * 3 + j
+                if index < num_recommendations:
+                    recommendation = recommendations[index]
+                    with col1, col2, col3:
+                        st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+                        # Display the image from URL
+                        image_url = recommendation['image_url']
+                        try:
+                            response = requests.get(image_url)
+                            img = Image.open(BytesIO(response.content))
+                            st.image(img, caption=recommendation['location'], width=250)
+                        except Exception as e:
+                            st.write(f"Error loading image from URL: {image_url}")
+                            st.write(e)
+                else:
+                    break
     else:
         st.write("No recommendations found based on your input.")
-st.stop()

@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -45,35 +44,35 @@ def get_recommendations(location, hashtags_str):
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 
-def image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    # Encode the bytes object to base64
-    encoded_img = base64.b64encode(buffered.getvalue())
-    # Convert the encoded bytes to a string
-    return encoded_img.decode('utf-8')
-
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        for i, recommendation in enumerate(recommendations):
-            try:
-                # Display the image from GitHub repository using the provided URL
-                image_url = recommendation['image_url']
-                # Modify the URL to the correct format
-                full_image_url = f"{base_github_url}/{image_url}"
-                # Change the URL to view raw content
-                full_image_url = full_image_url.replace("/blob/", "/raw/")
-                response = requests.get(full_image_url)
-                img = Image.open(BytesIO(response.content))
-                # Display image with expander for pop-up effect
-                with st.expander(f"Click to view details: {recommendation['image_title']}"):
-                    st.image(img, caption=f"Location: {recommendation['location']}, Hashtag: {recommendation['hashtag']}")
-            except Exception as e:
-                st.write(f"Error loading image from URL: {full_image_url}")
-                st.write(e)
+        num_recommendations = len(recommendations)
+        num_columns = 2
+        num_rows = -(-num_recommendations // num_columns)  # Ceiling division to calculate number of rows needed
+        for i in range(num_rows):
+            cols = st.beta_columns(num_columns)
+            for j in range(num_columns):
+                index = i * num_columns + j
+                if index < num_recommendations:
+                    recommendation = recommendations[index]
+                    try:
+                        # Display the image from GitHub repository using the provided URL
+                        image_url = recommendation['image_url']
+                        # Modify the URL to the correct format
+                        full_image_url = f"{base_github_url}/{image_url}"
+                        # Change the URL to view raw content
+                        full_image_url = full_image_url.replace("/blob/", "/raw/")
+                        response = requests.get(full_image_url)
+                        img = Image.open(BytesIO(response.content))
+                        # Display image with expander for pop-up effect
+                        with cols[j].expander(f"Click to view details: {recommendation['image_title']}"):
+                            cols[j].image(img, caption=f"Location: {recommendation['location']}, Hashtag: {recommendation['hashtag']}")
+                    except Exception as e:
+                        st.write(f"Error loading image from URL: {full_image_url}")
+                        st.write(e)
     else:
         st.write("No recommendations found based on your input.")
 

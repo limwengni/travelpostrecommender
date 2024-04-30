@@ -49,29 +49,56 @@ def image_to_base64(image):
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
-# Custom function to resize image
-def resize_image(image, size):
-    return image.resize(size)
-
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        for recommendation in recommendations:
-            try:
-                # Display the image thumbnail
-                image_url = recommendation['image_url']
-                response = requests.get(image_url)
-                img = Image.open(BytesIO(response.content))
-                img_thumbnail = resize_image(img, (100, 100))
-                st.image(img_thumbnail, caption=recommendation['image_title'], use_column_width=False)
-
-                # Show enlarged image in a modal when thumbnail is clicked
-                if st.button("Enlarge"):
-                    st.image(img, caption=recommendation['image_title'], use_column_width=True)
-            except Exception as e:
-                st.write(f"Error loading image: {e}")
+        num_recommendations = len(recommendations)
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
+        for i in range(num_rows):
+            row_html = "<div style='display:flex;'>"
+            for j in range(3):
+                index = i * 3 + j
+                if index < num_recommendations:
+                    recommendation = recommendations[index]
+                    # Display the image from GitHub repository using the provided URL
+                    image_url = recommendation['image_url']
+                    # Modify the URL to the correct format
+                    full_image_url = f"{base_github_url}/{image_url}"
+                    # Change the URL to view raw content
+                    full_image_url = full_image_url.replace("/blob/", "/raw/")
+                    try:
+                        response = requests.get(full_image_url)
+                        img = Image.open(BytesIO(response.content))
+                        # Get image dimensions
+                        width, height = img.size
+                        # Calculate padding to make the image square
+                        padding = abs(width - height) // 2
+                        # Add padding to the shorter side
+                        if width < height:
+                            img = img.crop((0, padding, width, height - padding))
+                        else:
+                            img = img.crop((padding, 0, width - padding, height))
+                        # Resize the image to 250x250
+                        img = img.resize((250, 250))
+                        # Convert the image to base64
+                        img_base64 = image_to_base64(img)
+                        # Create HTML for displaying image with image_title, location, and hashtag
+                        img_html = f"""
+                        <div style="text-align:center; margin-right: 20px;">
+                            <p style="font-weight:bold;">{recommendation['image_title']}</p>
+                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
+                            <p>Location: {recommendation['location']}</p>
+                            <p>Hashtag: #{recommendation['hashtag']}</p>
+                        </div>
+                        """
+                        row_html += img_html
+                    except Exception as e:
+                        st.write(f"Error loading image from URL: {full_image_url}")
+                        st.write(e)
+            row_html += "</div>"
+            st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")
 

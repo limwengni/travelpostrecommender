@@ -104,3 +104,37 @@ def showDetails(title, location, hashtag, image_url):
     st.write(f"Hashtag: {hashtag}")
     st.image(image_url, use_column_width=True)
 
+st.markdown(
+    """
+    <script>
+        function showDetails(title, location, hashtag, image_url) {
+            const body = document.getElementsByTagName('body')[0];
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '0';
+            modal.style.left = '0';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = '9999';
+            modal.innerHTML = `
+                <div style="background-color: white; padding: 20px; border-radius: 10px; max-width: 80%; max-height: 80%;">
+                    <h3>Title: ${title}</h3>
+                    <p>Location: ${location}</p>
+                    <p>Hashtag: ${hashtag}</p>
+                    <img src="${image_url}" style="max-width: 100%; max-height: 300px;">
+                    <button onclick="closeModal()">Close</button>
+                </div>
+            `;
+            body.appendChild(modal);
+            function closeModal() {
+                body.removeChild(modal);
+            }
+        }
+    </script>
+    """,
+    unsafe_allow_html=True
+)

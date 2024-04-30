@@ -40,9 +40,9 @@ def get_recommendations(location, hashtags_str):
 
 # Function to display details in popout when image is clicked
 def show_details(recommendation):
+    st.write(f"Title: {recommendation['image_title']}")
     st.write(f"Location: {recommendation['location']}")
     st.write(f"Hashtag: {recommendation['hashtag']}")
-    st.write(f"Title: {recommendation['image_title']}")
 
 # Call the recommendation function
 if st.button("Recommend"):
@@ -78,10 +78,11 @@ if st.button("Recommend"):
                             img = img.crop((padding, 0, width - padding, height))
                         # Resize the image to 250x250
                         img = img.resize((250, 250))
-                        # Display image with a click event to show popout details
-                        if st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True, 
-                                     on_click=show_details, args=(recommendation,)):
-                            pass
+                        # Display image
+                        st.image(img, caption=recommendation['image_title'], use_column_width=True, clamp=True)
+                        # Display button to show details when clicked
+                        if st.button("Show Details", key=f"button_{index}"):
+                            show_details(recommendation)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

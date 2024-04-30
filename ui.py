@@ -88,8 +88,9 @@ if st.button("Recommend"):
                         img_location = recommendation['location']
                         # Construct HTML for displaying image with details
                         img_html = f"""
-                          <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px
-                           onclick="showDetails('{img_title}', '{img_location}', '{img_hashtag}', '{full_image_url}')">
+                          <div style="margin-right:10px; margin-bottom: 10px" onclick="showDetails('{img_title}', '{img_location}', '{img_hashtag}', '{full_image_url}')">
+                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px;">
+                          </div>
                           """
                         row_html += img_html
                     except Exception as e:

@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -85,11 +84,15 @@ if st.button("Recommend"):
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
+                        # Access recommendation details
+                        img_location = recommendation['location']
                         img_hashtag = recommendation['hashtag']
-                        # Create HTML for displaying image
+                        # Construct HTML for displaying image with details
                         img_html = f"""
                           <div style="text-align:center;">
                               <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
+                              <p style="font-weight:bold;">Location:</p>
+                              <p>{img_location}</p>
                               <p style="font-weight:bold;">Hashtag:</p>
                               <div style="border: 1px solid black; padding: 5px; display: inline-block;">
                                 <p style="margin: 0;">#{img_hashtag}</p>

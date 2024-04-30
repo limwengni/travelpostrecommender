@@ -36,44 +36,58 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'title']].head(10).to_dict('records')
             return recommendations
     return []
 
-# Function to convert image to base64 format
+base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+
 def image_to_base64(image):
     buffered = BytesIO()
     image.save(buffered, format="JPEG")
+    # Encode the bytes object to base64
     encoded_img = base64.b64encode(buffered.getvalue())
+    # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
-# Function to display the recommendations
-def display_recommendations(recommendations):
-    base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
-    for recommendation in recommendations:
-        st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-        image_url = recommendation['image_url']
-        full_image_url = f"{base_github_url}/{image_url}"
-        full_image_url = full_image_url.replace("/blob/", "/raw/")
-        try:
-            response = requests.get(full_image_url)
-            img = Image.open(BytesIO(response.content))
-            # Convert image to base64
-            img_base64 = image_to_base64(img)
-            # Display the image with a link to the original image
-            img_html = f'<a href="{full_image_url}" target="_blank"><img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px"></a>'
-            st.write(img_html, unsafe_allow_html=True)
-        except Exception as e:
-            st.write(f"Error loading image from URL: {full_image_url}")
-            st.write(e)
-            row_html += "</div>"
-            st.write(row_html, unsafe_allow_html=True)
-
+# Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
     if recommendations:
         st.subheader("Recommendations:")
-        display_recommendations(recommendations)
+        for recommendation in recommendations:
+            try:
+                # Display the image from GitHub repository using the provided URL
+                image_url = recommendation['image_url']
+                # Modify the URL to the correct format
+                full_image_url = f"{base_github_url}/{image_url}"
+                # Change the URL to view raw content
+                full_image_url = full_image_url.replace("/blob/", "/raw/")
+                response = requests.get(full_image_url)
+                img = Image.open(BytesIO(response.content))
+                # Get image dimensions
+                width, height = img.size
+                # Calculate padding to make the image square
+                padding = abs(width - height) // 2
+                # Add padding to the shorter side
+                if width < height:
+                    img = img.crop((0, padding, width, height - padding))
+                else:
+                    img = img.crop((padding, 0, width - padding, height))
+                # Resize the image to 250x250
+                img = img.resize((250, 250))
+                # Convert the image to base64
+                img_base64 = image_to_base64(img)
+                # Create HTML for displaying image
+                img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
+                # Add click event to the image to display pop-up container
+                with st.expander(f"Click to view details: {recommendation['title']}"):
+                    st.write(f"Location: {recommendation['location']}")
+                    st.write(f"Hashtag: {recommendation['hashtag']}")
+                    st.image(img, use_column_width=True)
+            except Exception as e:
+                st.write(f"Error loading image from URL: {full_image_url}")
+                st.write(e)
     else:
         st.write("No recommendations found based on your input.")
 

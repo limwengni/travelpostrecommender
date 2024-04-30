@@ -54,25 +54,34 @@ if st.button("Recommend"):
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            st.write("<div style='display:flex;'>", unsafe_allow_html=True)
+            row = st.empty()  # Create an empty placeholder to display the row
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations[index]
-                    st.write("<div style='flex:1; padding:5px;'>", unsafe_allow_html=True)
-                    st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
                     # Display the image from URL
                     image_url = recommendation['image_url']
                     try:
                         response = requests.get(image_url)
                         img = Image.open(BytesIO(response.content))
-                        st.image(img, caption=recommendation['location'], width=250)
+                        # Resize image to desired size (e.g., 250x250)
+                        img.thumbnail((250, 250))
+                        # Convert image to HTML for displaying in DataFrame
+                        img_html = f'<img src="data:image/jpeg;base64,{Image_to_Base64(img)}" style="max-width:100%; max-height:100%;">'
+                        recommendation['Image'] = img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {image_url}")
                         st.write(e)
-                    st.write("</div>", unsafe_allow_html=True)
-                else:
-                    break
-            st.write("</div>", unsafe_allow_html=True)
+            # Create a DataFrame for the current row and display it
+            row_df = pd.DataFrame(recommendations[i * 3:min((i + 1) * 3, num_recommendations)])
+            st.dataframe(row_df.style.hide_index(), height=300)  # Adjust height as needed
+            st.write("<br>", unsafe_allow_html=True)  # Add some space between rows
+
     else:
         st.write("No recommendations found based on your input.")
+
+# Function to convert image to base64 format
+def Image_to_Base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    return b64encode(buffered.getvalue()).decode('utf-8')

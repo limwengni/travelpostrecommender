@@ -35,7 +35,7 @@ def get_recommendations(location, hashtags_str):
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
             # Get top 10 recommendations
-            recommendations = sorted_df[['location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['location', 'hashtag', 'image_url', 'image_title']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -48,6 +48,31 @@ def image_to_base64(image):
     encoded_img = base64.b64encode(buffered.getvalue())
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
+
+# JavaScript for modal popup
+modal_script = """
+<script>
+    function showModal(title, full_image, location, hashtag) {
+        const modal = document.createElement('div');
+        modal.innerHTML = `
+            <div style="background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; align-items: center; z-index: 999;">
+                <div style="background-color: white; padding: 20px; border-radius: 5px; max-width: 80%; max-height: 80%; overflow-y: auto;">
+                    <h2>${title}</h2>
+                    <img src="${full_image}" style="max-width: 100%; max-height: 60vh; margin-bottom: 20px;">
+                    <p><strong>Location:</strong> ${location}</p>
+                    <p><strong>Hashtag:</strong> ${hashtag}</p>
+                    <button onclick="closeModal()">Close</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    function closeModal() {
+        document.querySelector('div[role="dialog"]').remove();
+    }
+</script>
+"""
 
 # Call the recommendation function
 if st.button("Recommend"):
@@ -87,24 +112,21 @@ if st.button("Recommend"):
                         # Access recommendation details
                         img_location = recommendation['location']
                         img_hashtag = recommendation['hashtag']
-                        # Construct HTML for displaying image with details
+                        img_title = recommendation['image_title']
+                        # Construct HTML for displaying image with details and JavaScript to open modal popup
                         img_html = f"""
-                          <div style="text-align:center;">
-                              <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom: 5px;">
-                              <p style="font-weight:bold;">Location:</p>
-                              <p>{img_location}</p>
-                              <p style="font-weight:bold;">Hashtag:</p>
-                              <div style="border: 1px solid black; padding: 5px; display: inline-block;">
-                                <p style="margin: 0;">{img_hashtag}</p>
-                              </div>
-                          </div>
-                          """
+                          <img src="data:image/jpeg;base64,{img_base64}" 
+                               style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px; cursor: pointer;"
+                               onclick="showModal('{img_title}', '{full_image_url}', '{img_location}', '#{img_hashtag}')">
+                        """
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
-            st.write(row_html, unsafe_allow_html=True)  # Move this line outside of the inner loop
+            row_html += "</div>"
+            st.markdown(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 
-st.stop()
+# Display the JavaScript for modal popup
+st.markdown(modal_script, unsafe_allow_html=True)

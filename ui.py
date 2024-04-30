@@ -98,10 +98,9 @@ if st.button("Recommend"):
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
-                row_html += "</div>"
+            row_html += "</div>"
             st.write(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 
 st.stop()
-

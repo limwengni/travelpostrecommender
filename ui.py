@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import pickle
 import requests
 from PIL import Image
 from io import BytesIO
@@ -55,20 +56,20 @@ if st.button("Recommend"):
     if recommendations:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_rows = -(-num_recommendations // 3)  # Ceiling division to calculate number of rows needed
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            st.write("<div style='display:flex;'>", unsafe_allow_html=True)
+            row_html = "<div style='display:flex;'>"
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations[index]
+                    # Display the image from GitHub repository using the provided URL
+                    image_url = recommendation['image_url']
+                    # Modify the URL to the correct format
+                    full_image_url = f"{base_github_url}/{image_url}"
+                    # Change the URL to view raw content
+                    full_image_url = full_image_url.replace("/blob/", "/raw/")
                     try:
-                        # Display the image from GitHub repository using the provided URL
-                        image_url = recommendation['image_url']
-                        # Modify the URL to the correct format
-                        full_image_url = f"{base_github_url}/{image_url}"
-                        # Change the URL to view raw content
-                        full_image_url = full_image_url.replace("/blob/", "/raw/")
                         response = requests.get(full_image_url)
                         img = Image.open(BytesIO(response.content))
                         # Get image dimensions
@@ -86,11 +87,12 @@ if st.button("Recommend"):
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image
                         img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
-                        st.write(img_html, unsafe_allow_html=True)
+                        row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
-            st.write("</div>", unsafe_allow_html=True)
+            row_html += "</div>"
+            st.write(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 

@@ -19,6 +19,7 @@ hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
 #    location = "..."  # Extracted location
 #    hashtags_str = "..."  # Extracted hashtags
 
+@st.cache(suppress_st_warning=True)
 # Call the recommendation function
 def get_recommendations(location, hashtags_str):
     travel = pd.read_csv("image_dataset.csv")
@@ -49,7 +50,21 @@ base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
-    if recommendations:
+    if not recommendations:
+  st.write("No recommendations found based on your input.")
+else:
+
+  @st.cache(suppress_st_warning=True)
+  def display_recommendation(recommendation, image_url):
+    try:
+      response = requests.get(image_url)
+      img = Image.open(BytesIO(response.content))
+      st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+      st.image(img, width=250)
+    except Exception as e:
+      st.write(f"Error loading image from URL: {image_url}")
+      st.write(e)
+
   st.subheader("Recommendations:")
   num_recommendations = len(recommendations)
   num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
@@ -59,15 +74,5 @@ if st.button("Recommend"):
       if index < num_recommendations:
         recommendation = recommendations[index]
         image_url = recommendation['image_url']
-        try:
-          response = requests.get(image_url)
-          img = Image.open(BytesIO(response.content))
-          # Access columns directly
-          if j == 0:
-            st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-          st.image(img, width=250)
-        except Exception as e:
-          st.write(f"Error loading image from URL: {image_url}")
-          st.write(e)
-    else:
-        st.write("No recommendations found based on your input.")
+        # Call cached function
+        display_recommendation(recommendation, image_url)

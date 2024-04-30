@@ -4,9 +4,14 @@ import pickle
 import requests
 from PIL import Image
 from io import BytesIO
+import base64
+
+# Assuming you have your get_recommendations function defined
+
+st.title("Travel Recommendation App")
 
 # Get user input for location and hashtags (combined string)
-location = st.text_input("Enter Location (Optional):")
+location = st.text_input("Enter Location:")
 hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
 
 # Call the recommendation function
@@ -61,11 +66,8 @@ def display_recommendations(recommendations):
         except Exception as e:
             st.write(f"Error loading image from URL: {full_image_url}")
             st.write(e)
-
-# Streamlit app
-st.title("Travel Recommendation App")
-location = st.text_input("Enter Location:")
-hashtags_str = st.text_input("Enter Hashtags (e.g., cultural tours):")
+            row_html += "</div>"
+            st.write(row_html, unsafe_allow_html=True)
 
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
@@ -74,4 +76,5 @@ if st.button("Recommend"):
         display_recommendations(recommendations)
     else:
         st.write("No recommendations found based on your input.")
+
 st.stop()

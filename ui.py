@@ -34,11 +34,8 @@ def get_recommendations(location, hashtags_str):
             )
             # Sort entries based on hashtag similarity score
             sorted_df = filtered_df.sort_values(by='hashtag_sim_score', ascending=False)
-            # Print out sorted_df for inspection
-            print("Sorted DataFrame:")
-            print(sorted_df)
             # Get top 10 recommendations
-            recommendations = sorted_df[['image_title', 'location', 'hashtag', 'image_url']].head(10).to_dict('records')
+            recommendations = sorted_df[['title', 'location', 'hashtag', 'image_url']].head(10).to_dict('records')
             return recommendations
     return []
 
@@ -89,9 +86,9 @@ if st.button("Recommend"):
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image with title, location, and hashtag
                         img_html = f"""
-                        <div>
-                            <p style="font-weight:bold;">{recommendation['image_title']}</p>
-                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">
+                        <div style="text-align:center;">
+                            <p style="font-weight:bold;">{recommendation['title']}</p>
+                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
                             <p>Location: {recommendation['location']}</p>
                             <p>Hashtag: #{recommendation['hashtag']}</p>
                         </div>
@@ -101,7 +98,7 @@ if st.button("Recommend"):
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
             row_html += "</div>"
-            st.write(row_html, unsafe_allow_html=True)
+            st.markdown(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
 

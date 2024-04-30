@@ -40,6 +40,12 @@ def get_recommendations(location, hashtags_str):
     return []
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+
+# Function to convert image to base64 format
+def image_to_base64(image):
+    buffered = BytesIO()
+    image.save(buffered, format="JPEG")
+    return buffered.getvalue().encode("base64").decode('utf-8')
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)
@@ -74,10 +80,4 @@ if st.button("Recommend"):
             st.write(row_html, unsafe_allow_html=True)
     else:
         st.write("No recommendations found based on your input.")
-
-# Function to convert image to base64 format
-def image_to_base64(image):
-    buffered = BytesIO()
-    image.save(buffered, format="JPEG")
-    return buffered.getvalue().encode("base64").decode('utf-8')
 st.stop()

@@ -48,6 +48,8 @@ def image_to_base64(image):
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
+base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = get_recommendations(location, hashtags_str)

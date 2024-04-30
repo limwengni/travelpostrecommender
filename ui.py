@@ -46,8 +46,6 @@ def get_recommendations(location, hashtags_str):
     return []
 
 base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
-# Call the recommendation function
-pass
 
 # Function to convert image to base64 format
 def image_to_base64(image):

@@ -53,13 +53,6 @@ if st.button("Recommend"):
   st.subheader("Recommendations:")
   num_recommendations = len(recommendations)
   num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-  col1_list, col2_list, col3_list = [], [], []
-  for i in range(num_rows):
-    for j in range(3):
-      col1_list.append(st.empty())
-      col2_list.append(st.empty())
-      col3_list.append(st.empty())
-
   for i in range(num_rows):
     for j in range(3):
       index = i * 3 + j
@@ -69,12 +62,12 @@ if st.button("Recommend"):
         try:
           response = requests.get(image_url)
           img = Image.open(BytesIO(response.content))
-          # Fill placeholders with content
+          # Access columns directly
           if j == 0:
-            col1_list[i].write(f"- {recommendation['location']}: {recommendation['hashtag']}")
-          col2_list[i].image(img, width=250)
+            st.write(f"- {recommendation['location']}: {recommendation['hashtag']}")
+          st.image(img, width=250)
         except Exception as e:
-          col1_list[i].write(f"Error loading image from URL: {image_url}")
-          col1_list[i].write(e)
+          st.write(f"Error loading image from URL: {image_url}")
+          st.write(e)
     else:
         st.write("No recommendations found based on your input.")

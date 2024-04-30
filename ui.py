@@ -44,7 +44,7 @@ base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 
 def image_to_base64(image):
     buffered = BytesIO()
-    image.save(buffered, format="PNG")
+    image.save(buffered, format="JPEG")
     # Encode the bytes object to base64
     encoded_img = base64.b64encode(buffered.getvalue())
     # Convert the encoded bytes to a string
@@ -86,7 +86,7 @@ if st.button("Recommend"):
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
                         # Create HTML for displaying image
-                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px;">'
+                        img_html = f'<img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-right:10px; margin-bottom: 10px">'
                         row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")

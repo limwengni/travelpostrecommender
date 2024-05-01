@@ -43,6 +43,7 @@ base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
 
 def image_to_base64(image):
     buffered = BytesIO()
+    image = image.convert('RGB')
     image.save(buffered, format="JPEG")
     # Encode the bytes object to base64
     encoded_img = base64.b64encode(buffered.getvalue())

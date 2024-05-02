@@ -68,7 +68,7 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-    if recommendations:
+    if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
@@ -77,7 +77,7 @@ if st.button("Recommend"):
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
-                    recommendation = recommendations[index]
+                    recommendation = recommendations.iloc[index]
                     # Display the image from GitHub repository using the provided URL
                     image_url = recommendation['image_url']
                     # Modify the URL to the correct format

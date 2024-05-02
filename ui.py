@@ -156,9 +156,9 @@ feedback = st.radio("Was this recommendation helpful?", ("Yes", "No"))
 # Store feedback along with the recommendations
 if not recommendations.empty:
     if feedback == "Yes":
-        recommendations["feedback"] = 1
+        recommendation["feedback"] = 1
     elif feedback == "No":
-        recommendations["feedback"] = 0
-    recommendations.to_csv(feedback_file, mode="a", header=False)
+        recommendation["feedback"] = 0
+    recommendation.to_csv(feedback_file, mode="a", header=False)
     
 st.stop()

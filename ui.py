@@ -20,33 +20,20 @@ def get_hashtags():
     return sorted(list(hashtags))
 
 def recommend_posts_hashtag(location, hashtags):
-    # Handle empty hashtags list
+    # Handle empty hashtags
     if not hashtags:
         return pd.DataFrame()
 
-    # Filter posts by location
-    filtered_posts = travel_posts[travel_posts["location"] == location].copy()
-    if filtered_posts.empty:
-        return pd.DataFrame()
-
-    # Initialize list to store recommendations with scores
     recommended_posts = []
+    for _, post in travel_posts.iterrows():
+        if location == post["location"]:
+            common_hashtags = set(post["hashtag"].split(", ")) & set(hashtags)
+            score = len(common_hashtags)
+            if score > 0:
+                post['score'] = score  # Add the score to the recommendation
+                recommended_posts.append(post)
 
-    # Calculate score for each post
-    for _, post in filtered_posts.iterrows():
-        common_hashtags = set(post["hashtag"].split(", ")) & set(hashtags)
-        score = len(common_hashtags)
-        if score > 0:
-            recommended_posts.append((post, score))
-
-    # Sort recommendations based on hashtag similarity score
-    recommended_posts.sort(key=lambda x: x[1], reverse=True)
-
-    # Create DataFrame of recommendations
-    recommendations = pd.DataFrame([post for post, _ in recommended_posts], columns=travel_posts.columns)
-    recommendations["score"] = [score for _, score in recommended_posts]
-
-    return recommendations
+    return pd.DataFrame(recommended_posts)
 
 def recommend_posts_knn(location, hashtag):
     encoder = OneHotEncoder(handle_unknown='ignore')
@@ -63,6 +50,7 @@ def recommend_posts_knn(location, hashtag):
     distances, indices = knn.kneighbors(encoded_user_input)
 
     recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
+    recommendations['score'] = 1 / (1 + distances[0])  # Adding score column
     return recommendations
 
 def image_to_base64(image):

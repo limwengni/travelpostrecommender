@@ -98,13 +98,9 @@ if st.button("Recommend"):
                     try:
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
-                            # Display the image
+                            # Display the image with title above
+                            st.markdown(f"## Location: {recommendation['location']}\n### Hashtags: {' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}")
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
-                            
-                            # Display location and hashtags as small labels
-                            st.markdown(f"**Location:** {recommendation['location']}")
-                            st.markdown(f"**Hashtags:** {' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}")
-                            
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

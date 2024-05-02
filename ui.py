@@ -99,7 +99,7 @@ if st.button("Recommend"):
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
                             # Display the image with title above
-                            st.markdown(f"## {recommendation['location']}")
+                            st.markdown(f"## Image Title: {recommendation['image_title']}")
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
                             st.markdown(f"### Location: {recommendation['location']}\n#### Hashtags: {' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}")
                     except Exception as e:

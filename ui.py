@@ -103,9 +103,9 @@ if st.button("Recommend"):
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
 
                             # Display location and hashtags in small boxes
-                            st.markdown(f"<div style='display:flex; margin-top: 10px;'>"
-                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 5px;'>{recommendation['location']}</div>"
-                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
+                            st.markdown(f"<div style='display:flex; margin-top: 10px; text-align: center;'>"
+                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 5px; width: 250px;'>{recommendation['location']}</div>"
+                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 250px;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
                                         f"</div>", unsafe_allow_html=True)
 
                     except Exception as e:

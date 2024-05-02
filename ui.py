@@ -79,20 +79,15 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-    # Debug print statements to check recommendations
-    st.write(recommendations.head())
-
     # Check if recommendations are available
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_images_per_row = 3
-        num_rows = (num_recommendations + num_images_per_row - 1) // num_images_per_row
-
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            col1, col2, col3 = st.columns(3)  # Create three columns for each image in the row
-            for j in range(num_images_per_row):
-                index = i * num_images_per_row + j
+            row_html = "<div style='display:flex;'>"
+            for j in range(3):
+                index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations.iloc[index]
                     # Display the image from GitHub repository using the provided URL
@@ -103,21 +98,15 @@ if st.button("Recommend"):
                     try:
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
-                            # Display the image
+                            # Load the image using PIL
                             img = Image.open(BytesIO(response.content))
-                            # Resize the image to 250x250
-                            img = img.resize((250, 250))
-                            if j == 0:
-                                with col1:
-                                    st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}")
-                            elif j == 1:
-                                with col2:
-                                    st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}")
-                            else:
-                                with col3:
-                                    st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}")
+                            # Display the image
+                            st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
+
+            row_html += "</div>"
+            st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")

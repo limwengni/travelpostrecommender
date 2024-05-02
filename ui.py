@@ -79,9 +79,6 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-    # Debug print statements to check recommendations
-    st.write(recommendations.head())
-
     # Check if recommendations are available
     if not recommendations.empty:
         st.subheader("Recommendations:")
@@ -102,14 +99,12 @@ if st.button("Recommend"):
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
                             # Display the image
-                            img = Image.open(BytesIO(response.content))
-                            # Resize the image to 250x250
-                            img = img.resize((250, 250))
-                            st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=False)
+                            st.image(full_image_url, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
 
-            st.write("</div>")
+            row_html += "</div>"
+            st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")

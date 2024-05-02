@@ -102,6 +102,12 @@ if st.button("Recommend"):
                             st.markdown(f"## {recommendation['image_title']}")
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
 
+                            st.sidebar.markdown(f"`{recommendation['location']}`")
+    
+                            hashtags = recommendation['hashtag'].split(', ')
+                            for tag in hashtags:
+                               st.sidebar.markdown(f"`#{tag.strip()}`")
+
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
@@ -109,13 +115,7 @@ if st.button("Recommend"):
             row_html += "</div>"
             st.html(row_html)
 
-        # Display location and hashtags in the sidebar
-        st.sidebar.markdown(f"### Location")
-        st.sidebar.markdown(f"`{recommendation['location']}`")
-        st.sidebar.markdown(f"### Hashtags")
-        hashtags = recommendation['hashtag'].split(', ')
-        for tag in hashtags:
-            st.sidebar.markdown(f"`#{tag.strip()}`")
+    
 
     else:
         st.write("No recommendations found based on your input.")

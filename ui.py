@@ -86,14 +86,13 @@ if st.button("Recommend"):
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-
-        # Create columns for displaying images in rows of three
-        cols = st.columns(3)
+        num_images_per_row = 3
+        num_rows = (num_recommendations + num_images_per_row - 1) // num_images_per_row
 
         for i in range(num_rows):
-            for j in range(3):
-                index = i * 3 + j
+            col1, col2, col3 = st.columns(3)  # Create three columns for each image in the row
+            for j in range(num_images_per_row):
+                index = i * num_images_per_row + j
                 if index < num_recommendations:
                     recommendation = recommendations.iloc[index]
                     # Display the image from GitHub repository using the provided URL
@@ -108,10 +107,17 @@ if st.button("Recommend"):
                             img = Image.open(BytesIO(response.content))
                             # Resize the image to 250x250
                             img = img.resize((250, 250))
-                            cols[j].image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=False)
+                            if j == 0:
+                                with col1:
+                                    st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}")
+                            elif j == 1:
+                                with col2:
+                                    st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}")
+                            else:
+                                with col3:
+                                    st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}")
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
-
     else:
         st.write("No recommendations found based on your input.")

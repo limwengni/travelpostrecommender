@@ -77,7 +77,7 @@ if st.button("Recommend"):
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
-                    recommendation = recommendations.iloc[index]
+                    recommendation = recommendations[index]
                     # Display the image from GitHub repository using the provided URL
                     image_url = recommendation['image_url']
                     # Modify the URL to the correct format

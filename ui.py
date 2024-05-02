@@ -101,7 +101,11 @@ if st.button("Recommend"):
                             # Display the image with title above
                             st.markdown(f"## {recommendation['image_title']}")
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
-                            st.markdown(f"### Location: {recommendation['location']}\n#### Hashtags: {' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}")
+                            st.sidebar.markdown(f"`{recommendation['location']}`")
+                            hashtags = recommendation['hashtag'].split(', ')
+                            for tag in hashtags:
+                                st.sidebar.markdown(f"`#{tag.strip()}`")
+
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

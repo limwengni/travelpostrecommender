@@ -101,10 +101,9 @@ if st.button("Recommend"):
                             # Display the image
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
                             
-                            # Display location, hashtags, and score in boxes
-                            st.info(f"Location: {recommendation['location']}")
-                            st.success(f"Hashtags: {recommendation['hashtag']}")
-                            st.info(f"Similarity Score: {recommendation['score']}")
+                            # Display location and hashtags as small labels
+                            st.markdown(f"**Location:** {recommendation['location']}")
+                            st.markdown(f"**Hashtags:** {' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}")
                             
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")

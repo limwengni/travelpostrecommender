@@ -103,9 +103,7 @@ if st.button("Recommend"):
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
 
                             # Display location and hashtags in the sidebar for each recommendation
-                            st.sidebar.markdown(f"### Location")
                             st.sidebar.markdown(f"`{recommendation['location']}`")
-                            st.sidebar.markdown(f"### Hashtags")
                             hashtags = recommendation['hashtag'].split(', ')
                             for tag in hashtags:
                                 st.sidebar.markdown(f"`#{tag.strip()}`")

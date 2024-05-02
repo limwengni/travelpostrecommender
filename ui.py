@@ -62,7 +62,7 @@ if st.button("Recommend"):
                     full_image_url = full_image_url.replace("/blob/", "/raw/")
 
                     try:
-                        response = requests.get(recommendation['image_url'])
+                        response = requests.get(recommendation['full_image_url'])
                         img = Image.open(BytesIO(response.content))
                         # Get image dimensions
                         width, height = img.size

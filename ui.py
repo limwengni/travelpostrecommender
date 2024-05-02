@@ -78,7 +78,6 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-    # Check if recommendations are not empty
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
@@ -97,13 +96,35 @@ if st.button("Recommend"):
                     try:
                         response = requests.get(full_image_url)
                         img = Image.open(BytesIO(response.content))
+                        # Get image dimensions
+                        width, height = img.size
+                        # Calculate padding to make the image square
+                        padding = abs(width - height) // 2
+                        # Add padding to the shorter side
+                        if width < height:
+                            img = img.crop((0, padding, width, height - padding))
+                        else:
+                            img = img.crop((padding, 0, width - padding, height))
                         # Resize the image to 250x250
                         img = img.resize((250, 250))
-                        st.subheader(recommendation['image_title'])
-                        st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
+                        # Convert the image to base64
+                        img_base64 = image_to_base64(img)
+                        # Create HTML for displaying image with image_title, location, and hashtag
+                        img_html = f"""
+                        <div style="text-align:center; margin-right: 20px;">
+                            <p style="font-weight:bold;">{recommendation['image_title']}</p>
+                            <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
+                            <p>Location: {recommendation['location']}</p>
+                            <p>Hashtag: #{recommendation['hashtag']}</p>
+                            <p>Similarity Score: {recommendation['score']}</p>
+                        </div>
+                        """
+                        row_html += img_html
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
+            row_html += "</div>"
+            st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")
 

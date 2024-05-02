@@ -6,32 +6,9 @@ from io import BytesIO
 import base64
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.base import BaseEstimator, TransformerMixin
-import joblib
-import os
 
 # Load travel posts data from CSV
 travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')
-
-# Load feedback data from CSV
-feedback_file = "https://raw.githubusercontent.com/limwengni/travelpostrecommender/main/user_feedback.csv"
-if os.path.exists(feedback_file) and os.path.getsize(feedback_file) > 0:
-    feedback_data = pd.read_csv(feedback_file)
-else:
-    feedback_data = pd.DataFrame(columns=travel_posts.columns)
-
-# Combine feedback data with existing dataset
-combined_data = pd.concat([travel_posts, feedback_data])
-
-class LocationHashtagEncoder(BaseEstimator, TransformerMixin):
-    def __init__(self):
-        self.encoder = OneHotEncoder(handle_unknown='ignore')
-        
-    def fit(self, X, y=None):
-        return self.encoder.fit(X[['location', 'hashtag']])
-        
-    def transform(self, X, y=None):
-        return self.encoder.transform(X[['location', 'hashtag']])
 
 def get_locations():
     return travel_posts["location"].unique()
@@ -59,8 +36,9 @@ def recommend_posts_hashtag(location, hashtags):
     return pd.DataFrame(recommended_posts)
 
 def recommend_posts_knn(location, hashtag):
-    knn = joblib.load('knn_model.pkl')
-    encoder = joblib.load('encoder.pkl')
+    encoder = OneHotEncoder(handle_unknown='ignore')
+    encoded_features = encoder.fit_transform(travel_posts[['location', 'hashtag']])
+    knn = NearestNeighbors(n_neighbors=10, algorithm='auto').fit(encoded_features)
 
     user_input_df = pd.DataFrame({
         'location': [location],
@@ -71,7 +49,7 @@ def recommend_posts_knn(location, hashtag):
 
     distances, indices = knn.kneighbors(encoded_user_input)
 
-    recommendations = combined_data.iloc[indices[0]].reset_index(drop=True)
+    recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
     recommendations['score'] = 1 / (1 + distances[0])  # Adding score column
     return recommendations
 
@@ -131,7 +109,7 @@ if st.button("Recommend"):
                         img = img.resize((250, 250))
                         # Convert the image to base64
                         img_base64 = image_to_base64(img)
-                        # Create HTML for displaying image with image_title, location, hashtag, and similarity score
+                        # Create HTML for displaying image with image_title, location, and hashtag
                         img_html = f"""
                         <div style="text-align:center; margin-right: 20px;">
                             <p style="font-weight:bold;">{recommendation['image_title']}</p>
@@ -149,16 +127,5 @@ if st.button("Recommend"):
             st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")
-
-    # Collect feedback
-    feedback = st.radio("Was this recommendation helpful?", ("Yes", "No"))
-
-    # Store feedback along with the recommendations
-    if not recommendations.empty:
-        if feedback == "Yes":
-            recommendations["feedback"] = 1
-        elif feedback == "No":
-            recommendations["feedback"] = 0
-        recommendations.to_csv(feedback_file, mode="a", header=False)
 
 st.stop()

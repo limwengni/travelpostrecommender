@@ -19,7 +19,7 @@ def get_hashtags():
         hashtags.update(tags.split(", "))
     return sorted(list(hashtags))
 
-def recommend_posts_hashtag(location, hashtags_str):
+def recommend_posts_hashtag(location, hashtags):
     # Handle empty hashtags string
     if not hashtags_str:
         return pd.DataFrame()

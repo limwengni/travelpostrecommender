@@ -35,14 +35,14 @@ def recommend_posts_hashtag(location, hashtags):
 
     return pd.DataFrame(recommended_posts)
 
-def recommend_posts_knn(location, hashtag):
+def recommend_posts_knn(location, hashtags):
     encoder = OneHotEncoder(handle_unknown='ignore')
     encoded_features = encoder.fit_transform(travel_posts[['location', 'hashtag']])
     knn = NearestNeighbors(n_neighbors=10, algorithm='auto').fit(encoded_features)
 
     user_input_df = pd.DataFrame({
         'location': [location],
-        'hashtag': [hashtag]
+        'hashtag': [", ".join(hashtags)]
     })
 
     encoded_user_input = encoder.transform(user_input_df)
@@ -50,7 +50,6 @@ def recommend_posts_knn(location, hashtag):
     distances, indices = knn.kneighbors(encoded_user_input)
 
     recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
-    recommendations['score'] = 1 / (1 + distances[0])  # Adding score column
     return recommendations
 
 def image_to_base64(image):

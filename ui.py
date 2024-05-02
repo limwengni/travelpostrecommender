@@ -21,11 +21,11 @@ def get_hashtags():
 
 def recommend_posts_hashtag(location, hashtags):
     # Handle empty hashtags string
-    if not hashtags_str:
+    if not hashtags:
         return pd.DataFrame()
 
     # Split the provided hashtags string into a list
-    hashtags = hashtags_str.strip().split()
+    hashtags = hashtags.strip().split()
 
     recommended_posts = []
     for _, post in travel_posts.iterrows():

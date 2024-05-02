@@ -78,7 +78,7 @@ hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
 # Call the recommendation function based on selected algorithm
 if st.button("Recommend"):
     if algorithm == "Hashtag-Based":
-        recommendations = recommend_posts_hashtag(location, hashtags_str)
+        recommendations = recommend_posts_hashtag(location, hashtags)
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 

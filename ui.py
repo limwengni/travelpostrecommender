@@ -6,17 +6,18 @@ from io import BytesIO
 import base64
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.metrics import accuracy_score
 from sklearn.base import BaseEstimator, TransformerMixin
+import joblib
 
 # Load travel posts data from CSV
 travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')
 
 # Load feedback data from CSV
-feedback_data = pd.read_csv("user_feedback.csv")
+feedback_file = "user_feedback.csv"
+if not os.path.exists(feedback_file):
+    feedback_data = pd.DataFrame(columns=travel_posts.columns)
+else:
+    feedback_data = pd.read_csv(feedback_file)
 
 # Combine feedback data with existing dataset
 combined_data = pd.concat([travel_posts, feedback_data])
@@ -157,6 +158,6 @@ if not recommendations.empty:
         recommendations["feedback"] = 1
     elif feedback == "No":
         recommendations["feedback"] = 0
-    recommendations.to_csv("user_feedback.csv", mode="a", header=False)
+    recommendations.to_csv(feedback_file, mode="a", header=False)
     
 st.stop()

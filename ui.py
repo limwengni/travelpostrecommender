@@ -150,15 +150,14 @@ if st.button("Recommend"):
     else:
         st.write("No recommendations found based on your input.")
 
-# Collect feedback
-feedback = st.radio("Was this recommendation helpful?", ("Yes", "No"))
+    # Collect feedback
+    feedback = st.radio("Was this recommendation helpful?", ("Yes", "No"))
 
-# Store feedback along with the recommendations
-if not recommendations.empty:
+    # Store feedback along with the recommendations
     if feedback == "Yes":
         recommendations["feedback"] = 1
     elif feedback == "No":
         recommendations["feedback"] = 0
     recommendations.to_csv(feedback_file, mode="a", header=False)
-    
+
 st.stop()

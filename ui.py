@@ -104,8 +104,8 @@ if st.button("Recommend"):
 
                             # Display location and hashtags in small boxes
                             st.markdown(f"<div style='display:flex; margin-top: 5px; justify-content: center;'>"
-                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 5px; width: 250px; text-align: center;'>{recommendation['location']}</div>"
-                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 250px; text-align: center;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
+                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 5px; width: 150px; text-align: center;'>{recommendation['location']}</div>"
+                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; text-align: center;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
                                         f"</div>", unsafe_allow_html=True)
 
                     except Exception as e:

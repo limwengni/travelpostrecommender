@@ -79,6 +79,9 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
+    # Debug print statements to check recommendations
+    st.write(recommendations.head())
+
     # Check if recommendations are available
     if not recommendations.empty:
         st.subheader("Recommendations:")
@@ -94,6 +97,9 @@ if st.button("Recommend"):
                     image_url = recommendation['image_url']
                     # Modify the URL to the correct format
                     full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
+
+                    # Debug print statements to check image URLs
+                    st.write("Image URL:", full_image_url)
 
                     try:
                         response = requests.get(full_image_url)

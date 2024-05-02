@@ -4,6 +4,8 @@ import requests
 from PIL import Image
 from io import BytesIO
 import base64
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import OneHotEncoder
 
 # Load travel posts data from CSV
 travel_posts = pd.read_csv("image_dataset.csv")
@@ -17,20 +19,29 @@ def get_hashtags():
         hashtags.update(tags.split(", "))
     return sorted(list(hashtags))
 
-def recommend_posts(location, hashtags):
+def recommend_posts_hashtag(location, hashtags):
     recommended_posts = []
     for _, post in travel_posts.iterrows():
         if location == post["location"] and set(hashtags).intersection(post["hashtag"].split(", ")):
             recommended_posts.append(post)
     return recommended_posts
 
-st.title("Travel Recommendation App")
+def recommend_posts_knn(location, hashtag):
+    encoder = OneHotEncoder(handle_unknown='ignore')
+    encoded_features = encoder.fit_transform(travel_posts[['location', 'hashtag']])
+    knn = NearestNeighbors(n_neighbors=10, algorithm='auto').fit(encoded_features)
 
-# Get user input for location and hashtags
-location = st.selectbox("Select Location:", options=get_locations())
-hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
+    user_input_df = pd.DataFrame({
+        'location': [location],
+        'hashtag': [hashtag]
+    })
 
-base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+    encoded_user_input = encoder.transform(user_input_df)
+
+    distances, indices = knn.kneighbors(encoded_user_input)
+
+    recommendations = travel_posts.iloc[indices[0]]
+    return recommendations
 
 def image_to_base64(image):
     buffered = BytesIO()
@@ -41,9 +52,22 @@ def image_to_base64(image):
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
-# Call the recommendation function
+st.title("Travel Recommendation App")
+
+# Select recommendation algorithm
+algorithm = st.selectbox("Select Recommendation Algorithm:", ["Hashtag-Based", "KNN-Based"])
+
+# Get user input for location and hashtags
+location = st.selectbox("Select Location:", options=get_locations())
+hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
+
+# Call the recommendation function based on selected algorithm
 if st.button("Recommend"):
-    recommendations = recommend_posts(location, hashtags)
+    if algorithm == "Hashtag-Based":
+        recommendations = recommend_posts_hashtag(location, hashtags)
+    else:
+        recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
+
     if recommendations:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
@@ -53,13 +77,11 @@ if st.button("Recommend"):
             for j in range(3):
                 index = i * 3 + j
                 if index < num_recommendations:
-                    recommendation = recommendations[index]
+                    recommendation = recommendations.iloc[index]
                     # Display the image from GitHub repository using the provided URL
                     image_url = recommendation['image_url']
                     # Modify the URL to the correct format
-                    full_image_url = f"{base_github_url}/{image_url}"
-                    # Change the URL to view raw content
-                    full_image_url = full_image_url.replace("/blob/", "/raw/")
+                    full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
 
                     try:
                         response = requests.get(full_image_url)

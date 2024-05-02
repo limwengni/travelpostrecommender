@@ -70,21 +70,23 @@ if st.button("Recommend"):
                         # Resize the image to 250x250
                         img = img.resize((250, 250))
                         # Convert the image to base64
-                        img_base64 = base64.b64encode(BytesIO(response.content).read()).decode()
+                        img_base64 = image_to_base64(img)
                         # Create HTML for displaying image with image_title, location, and hashtag
                         img_html = f"""
                         <div style="text-align:center; margin-right: 20px;">
                             <p style="font-weight:bold;">{recommendation['image_title']}</p>
                             <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
                             <p>Location: {recommendation['location']}</p>
-                            <p>Hashtag: {recommendation['hashtag']}</p>
+                            <p>Hashtag: #{recommendation['hashtag']}</p>
                         </div>
                         """
                         row_html += img_html
                     except Exception as e:
-                        st.write(f"Error loading image from URL: {recommendation['image_url']}")
+                        st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
             row_html += "</div>"
-            st.markdown(row_html, unsafe_allow_html=True)
+            st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")
+
+st.stop()

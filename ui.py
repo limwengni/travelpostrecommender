@@ -19,22 +19,26 @@ def get_hashtags():
         hashtags.update(tags.split(", "))
     return sorted(list(hashtags))
 
-def recommend_posts_hashtag(location, hashtags):
+def recommend_posts_hashtag(location, hashtags_str):
+    # Handle empty hashtags string
+    if not hashtags_str:
+        return pd.DataFrame()
+
+    # Split the provided hashtags string into a list
+    hashtags = hashtags_str.strip().split()
+
     recommended_posts = []
     for _, post in travel_posts.iterrows():
-        if location == post["location"] and set(hashtags).intersection(post["hashtag"].split(", ")):
-            recommended_posts.append(post)
-    recommended_posts = pd.DataFrame(recommended_posts)  # Convert list to DataFrame
-    
-    # Calculate hashtag similarity scores for recommendations
-    recommended_posts['hashtag_sim_score'] = recommended_posts['hashtag'].apply(
-        lambda x: len(set(x.split(", ")) & set(hashtags))
-    )
-    
-    # Sort recommendations based on hashtag similarity score
-    recommended_posts = recommended_posts.sort_values(by='hashtag_sim_score', ascending=False)
-    return recommended_posts
+        if location == post["location"]:
+            common_hashtags = set(post["hashtag"].split(", ")) & set(hashtags)
+            score = len(common_hashtags)
+            if score > 0:
+                recommended_posts.append((post, score))
 
+    # Sort recommendations based on hashtag similarity score
+    recommended_posts.sort(key=lambda x: x[1], reverse=True)
+
+    return pd.DataFrame([post for post, _ in recommended_posts], columns=travel_posts.columns)
 
 def recommend_posts_knn(location, hashtag):
     encoder = OneHotEncoder(handle_unknown='ignore')
@@ -51,21 +55,7 @@ def recommend_posts_knn(location, hashtag):
     distances, indices = knn.kneighbors(encoded_user_input)
 
     recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
-    
-    # Calculate location and hashtag similarity scores for recommendations
-    recommendations['location_sim_score'] = (recommendations['location'] == location).astype(int)
-    recommendations['hashtag_sim_score'] = recommendations['hashtag'].apply(
-        lambda x: len(set(x.split(", ")) & set([hashtag]))
-    )
-
-    # Combine location and hashtag similarity scores using weighted average
-    recommendations['weighted_sim_score'] = 0.5 * recommendations['location_sim_score'] + 0.5 * recommendations['hashtag_sim_score']
-
-    # Sort recommendations based on weighted similarity score
-    recommendations = recommendations.sort_values(by='weighted_sim_score', ascending=False).head(10)
-    
     return recommendations
-
 
 def image_to_base64(image):
     buffered = BytesIO()
@@ -88,7 +78,7 @@ hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
 # Call the recommendation function based on selected algorithm
 if st.button("Recommend"):
     if algorithm == "Hashtag-Based":
-        recommendations = recommend_posts_hashtag(location, hashtags)
+        recommendations = recommend_posts_hashtag(location, hashtags_str)
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
@@ -130,6 +120,7 @@ if st.button("Recommend"):
                             <img src="data:image/jpeg;base64,{img_base64}" style="width:250px; height:250px; margin-bottom:10px;">
                             <p>Location: {recommendation['location']}</p>
                             <p>Hashtag: #{recommendation['hashtag']}</p>
+                            <p>Similarity Score: {recommendation['score']}</p>
                         </div>
                         """
                         row_html += img_html

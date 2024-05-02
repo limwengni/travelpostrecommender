@@ -8,7 +8,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import OneHotEncoder
 
 # Load travel posts data from CSV
-travel_posts = pd.read_csv("image_dataset.csv")
+travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')
 
 def get_locations():
     return travel_posts["location"].unique()

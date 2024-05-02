@@ -24,7 +24,7 @@ def recommend_posts_hashtag(location, hashtags):
     for _, post in travel_posts.iterrows():
         if location == post["location"] and set(hashtags).intersection(post["hashtag"].split(", ")):
             recommended_posts.append(post)
-    return recommended_posts
+    return pd.DataFrame(recommended_posts)  # Convert list to DataFrame
 
 def recommend_posts_knn(location, hashtag):
     encoder = OneHotEncoder(handle_unknown='ignore')
@@ -68,7 +68,7 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-    if not recommendations.empty:
+    if recommendations:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
@@ -116,5 +116,5 @@ if st.button("Recommend"):
             st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")
-
+        
 st.stop()

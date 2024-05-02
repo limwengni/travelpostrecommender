@@ -98,17 +98,11 @@ if st.button("Recommend"):
                     # Modify the URL to the correct format
                     full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
 
-                    # Debug print statements to check image URLs
-                    st.write("Image URL:", full_image_url)
-
                     try:
                         response = requests.get(full_image_url)
-                        if Image.isImageType(response.content):
-                            img = Image.open(BytesIO(response.content))
-                            # Resize the image to 250x250
-                            img = img.resize((250, 250))
-                            st.subheader(recommendation['image_title'])
-                            st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
+                        if response.status_code == 200:
+                            # Display the image
+                            st.image(full_image_url, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

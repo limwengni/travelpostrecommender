@@ -3,9 +3,6 @@ import pandas as pd
 import requests
 from PIL import Image
 from io import BytesIO
-import base64
-from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import OneHotEncoder
 
 # Load travel posts data from CSV
 travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')
@@ -36,31 +33,8 @@ def recommend_posts_hashtag(location, hashtags):
     return pd.DataFrame(recommended_posts)
 
 def recommend_posts_knn(location, hashtag):
-    encoder = OneHotEncoder(handle_unknown='ignore')
-    encoded_features = encoder.fit_transform(travel_posts[['location', 'hashtag']])
-    knn = NearestNeighbors(n_neighbors=10, algorithm='auto').fit(encoded_features)
-
-    user_input_df = pd.DataFrame({
-        'location': [location],
-        'hashtag': [hashtag]
-    })
-
-    encoded_user_input = encoder.transform(user_input_df)
-
-    distances, indices = knn.kneighbors(encoded_user_input)
-
-    recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
-    recommendations['score'] = 1 / (1 + distances[0])  # Adding score column
-    return recommendations
-
-def image_to_base64(image):
-    buffered = BytesIO()
-    image = image.convert('RGB')
-    image.save(buffered, format="JPEG")
-    # Encode the bytes object to base64
-    encoded_img = base64.b64encode(buffered.getvalue())
-    # Convert the encoded bytes to a string
-    return encoded_img.decode('utf-8')
+    # Replace this function with your KNN recommendation logic
+    pass
 
 st.title("Travel Recommendation App")
 
@@ -83,28 +57,28 @@ if st.button("Recommend"):
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-        for i in range(num_rows):
-            row_html = "<div style='display:flex;'>"
-            for j in range(3):
-                index = i * 3 + j
-                if index < num_recommendations:
-                    recommendation = recommendations.iloc[index]
-                    # Display the image from GitHub repository using the provided URL
-                    image_url = recommendation['image_url']
-                    # Modify the URL to the correct format
-                    full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
+        
+        # Calculate the number of rows and columns needed
+        num_cols = 3
+        num_rows = (num_recommendations + num_cols - 1) // num_cols
 
-                    try:
-                        response = requests.get(full_image_url)
-                        if response.status_code == 200:
-                            # Display the image
-                            st.image(full_image_url, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {full_image_url}")
-                        st.write(e)
+        # Create columns to display images
+        cols = st.beta_columns(num_cols)
+        for i in range(num_recommendations):
+            col_index = i % num_cols
+            col = cols[col_index]
 
-            row_html += "</div>"
-            st.html(row_html)
+            recommendation = recommendations.iloc[i]
+            image_url = recommendation['image_url']
+            full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
+
+            try:
+                response = requests.get(full_image_url)
+                if response.status_code == 200:
+                    img = Image.open(BytesIO(response.content))
+                    col.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
+            except Exception as e:
+                st.write(f"Error loading image from URL: {full_image_url}")
+                st.write(e)
     else:
         st.write("No recommendations found based on your input.")

@@ -8,6 +8,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.base import BaseEstimator, TransformerMixin
 import joblib
+import os
 
 # Load travel posts data from CSV
 travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')

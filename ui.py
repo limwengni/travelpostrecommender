@@ -15,10 +15,10 @@ travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')
 
 # Load feedback data from CSV
 feedback_file = "user_feedback.csv"
-if not os.path.exists(feedback_file):
-    feedback_data = pd.DataFrame(columns=travel_posts.columns)
-else:
+if os.path.exists(feedback_file) and os.path.getsize(feedback_file) > 0:
     feedback_data = pd.read_csv(feedback_file)
+else:
+    feedback_data = pd.DataFrame(columns=travel_posts.columns)
 
 # Combine feedback data with existing dataset
 combined_data = pd.concat([travel_posts, feedback_data])

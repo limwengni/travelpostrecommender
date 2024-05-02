@@ -102,9 +102,11 @@ if st.button("Recommend"):
                             st.markdown(f"## {recommendation['image_title']}")
                             st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
 
-                            # Display location and hashtags with colored boxes
-                            st.markdown(f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px;'>Location: {recommendation['location']}</div>", unsafe_allow_html=True)
-                            st.markdown(f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px;'>Hashtags: {' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>", unsafe_allow_html=True)
+                            # Display location and hashtags in small boxes
+                            st.markdown(f"<div style='display:flex; margin-top: 10px;'>"
+                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 5px;'>{recommendation['location']}</div>"
+                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
+                                        f"</div>", unsafe_allow_html=True)
 
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")

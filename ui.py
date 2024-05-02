@@ -20,29 +20,42 @@ def get_hashtags():
     return sorted(list(hashtags))
 
 def recommend_posts_hashtag(location, hashtags):
-    # Handle empty hashtags
+    # Handle empty hashtags list
     if not hashtags:
         return pd.DataFrame()
 
+    # Filter posts by location
+    filtered_posts = travel_posts[travel_posts["location"] == location].copy()
+    if filtered_posts.empty:
+        return pd.DataFrame()
+
+    # Initialize list to store recommendations with scores
     recommended_posts = []
-    for _, post in travel_posts.iterrows():
-        if location == post["location"]:
-            common_hashtags = set(post["hashtag"].split(", ")) & set(hashtags)
-            score = len(common_hashtags)
-            if score > 0:
-                post['score'] = score  # Add the score to the recommendation
-                recommended_posts.append(post)
 
-    return pd.DataFrame(recommended_posts)
+    # Calculate score for each post
+    for _, post in filtered_posts.iterrows():
+        common_hashtags = set(post["hashtag"].split(", ")) & set(hashtags)
+        score = len(common_hashtags)
+        if score > 0:
+            recommended_posts.append((post, score))
 
-def recommend_posts_knn(location, hashtags):
+    # Sort recommendations based on hashtag similarity score
+    recommended_posts.sort(key=lambda x: x[1], reverse=True)
+
+    # Create DataFrame of recommendations
+    recommendations = pd.DataFrame([post for post, _ in recommended_posts], columns=travel_posts.columns)
+    recommendations["score"] = [score for _, score in recommended_posts]
+
+    return recommendations
+
+def recommend_posts_knn(location, hashtag):
     encoder = OneHotEncoder(handle_unknown='ignore')
     encoded_features = encoder.fit_transform(travel_posts[['location', 'hashtag']])
     knn = NearestNeighbors(n_neighbors=10, algorithm='auto').fit(encoded_features)
 
     user_input_df = pd.DataFrame({
         'location': [location],
-        'hashtag': [", ".join(hashtags)]
+        'hashtag': [hashtag]
     })
 
     encoded_user_input = encoder.transform(user_input_df)

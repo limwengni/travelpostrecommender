@@ -25,9 +25,9 @@ image_id,image_title,hashtag,location,image_url
 24,Batu Caves,cultural tours,Selangor,images/batucaves.jpg
 25,Islamic Civilization Park,cultural tours,Terengganu,images/islamicpark.png
 26,Pulau Redang,beach vacations,Terengganu,images/redang.jpg
-27,Legoland,funny,Johor,images/legoland.jpg
+27,Legoland,leisure,Johor,images/legoland.jpg
 28,Putuo,cultural tours,Johor,images/putuo.jpg
-29,Premium Outles Johor,shopping,Johor,images/premiumoutles.jpg
+29,Premium Outlets Johor,shopping,Johor,images/premiumoutles.jpg
 30,Desaru fruit farm,hiking,Johor,images/desaru.jpg
 31,Chinese Heritage Museum,cultural tours,Johor,images/chineseheritagemuseum.jpg
 32,Puteri Harbour,hiking,Johor,images/puteriharbour.jpg
@@ -48,3 +48,23 @@ image_id,image_title,hashtag,location,image_url
 47,Mossy Forest,hiking,Pahang,images/mossy.jpg
 48,Boh Tea Plantation,hiking,Pahang,images/boh.jpg
 49,Time Tunnel Musuem,cultural tours,Pahang,images/time.jpg
+50,Laksa,foodie adventure,Kedah,images/laksakedah.jpg
+51,Gulai Temenung,foodie adventure,Kedah,images/gulai.jpg
+52,Pasar Malam Setia Alam,foodie adventure,Selangor,images/setiaalampasarmalam.jpg
+53,Sekinchan,leisure,Selangor,images/sekinchan.jpg
+54,Sunway Lagoon,leisure,Selangor,images/sunwaylagoon.jpg
+55,Gua Kelam,hiking,Perlis,images/guakelam.jpg
+56,Penang Hill,hiking,Penang,images/penanghill.jpg
+57,Curry Mee,foodie adventure,Penang,images/currymee.jpg
+58,Oyster Omelette,foodie adventure,Penang,images/oysteromelette.jpg
+59,Chicken Rice,foodie adventure,Penang,images/chickenrice.jpg
+60,Sarawak Mee,foodie adventure,Sarawak,images/kolomee.jpg
+61,Kacang Ma,foodie adventure,Sarawak,images/kacangma.jpg
+62,Nasi Aruk,foodie adventure,Sarawak,images/nasiaruk.jpg
+63,Sinalau Bakas,foodie adventure,Sabah,images/sinalaubakas.jpg
+64,Sang Nyuk Mee,foodie adventure,Sabah,images/sangnyukmee.jpg
+65,Banana Leaf Curry,foodie adventure,Sabah,images/bananaleafcurry.jpg
+66,A’ Famosa Fort,cultural tours,Melaka,images/afamosa.jpg
+67,Encore Melaka,cultural tours,Melaka,images/encore.jpg
+68,Menara Taming Sari,leisure,Melaka,images/menaratamingsari.jpg
+69,Chicken Rice Balls,foodie adventure,Melaka,images/chickenriceballs.jpg

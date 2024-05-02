@@ -54,7 +54,13 @@ if st.button("Recommend"):
                 index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations[index]
-                    # Display the image from URL
+                    # Display the image from GitHub repository using the provided URL
+                    image_url = recommendation['image_url']
+                    # Modify the URL to the correct format
+                    full_image_url = f"{base_github_url}/{image_url}"
+                    # Change the URL to view raw content
+                    full_image_url = full_image_url.replace("/blob/", "/raw/")
+
                     try:
                         response = requests.get(recommendation['image_url'])
                         img = Image.open(BytesIO(response.content))

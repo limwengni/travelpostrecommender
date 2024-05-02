@@ -40,7 +40,7 @@ def recommend_posts_knn(location, hashtag):
 
     distances, indices = knn.kneighbors(encoded_user_input)
 
-    recommendations = travel_posts.iloc[indices[0]]
+    recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
     return recommendations
 
 def image_to_base64(image):

@@ -20,12 +20,9 @@ def get_hashtags():
     return sorted(list(hashtags))
 
 def recommend_posts_hashtag(location, hashtags):
-    # Handle empty hashtags string
+    # Handle empty hashtags
     if not hashtags:
         return pd.DataFrame()
-
-    # Split the provided hashtags string into a list
-    hashtags = hashtags.strip().split()
 
     recommended_posts = []
     for _, post in travel_posts.iterrows():
@@ -33,12 +30,10 @@ def recommend_posts_hashtag(location, hashtags):
             common_hashtags = set(post["hashtag"].split(", ")) & set(hashtags)
             score = len(common_hashtags)
             if score > 0:
-                recommended_posts.append((post, score))
+                post['score'] = score  # Add the score to the recommendation
+                recommended_posts.append(post)
 
-    # Sort recommendations based on hashtag similarity score
-    recommended_posts.sort(key=lambda x: x[1], reverse=True)
-
-    return pd.DataFrame([post for post, _ in recommended_posts], columns=travel_posts.columns)
+    return pd.DataFrame(recommended_posts)
 
 def recommend_posts_knn(location, hashtag):
     encoder = OneHotEncoder(handle_unknown='ignore')

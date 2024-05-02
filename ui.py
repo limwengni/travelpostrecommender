@@ -30,6 +30,17 @@ st.title("Travel Recommendation App")
 location = st.selectbox("Select Location:", options=get_locations())
 hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
 
+base_github_url = "https://github.com/limwengni/travelpostrecommender/blob/main"
+
+def image_to_base64(image):
+    buffered = BytesIO()
+    image = image.convert('RGB')
+    image.save(buffered, format="JPEG")
+    # Encode the bytes object to base64
+    encoded_img = base64.b64encode(buffered.getvalue())
+    # Convert the encoded bytes to a string
+    return encoded_img.decode('utf-8')
+
 # Call the recommendation function
 if st.button("Recommend"):
     recommendations = recommend_posts(location, hashtags)

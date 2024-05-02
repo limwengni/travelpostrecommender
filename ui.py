@@ -71,43 +71,43 @@ algorithm = st.selectbox("Select Recommendation Algorithm:", ["Hashtag-Based", "
 location = st.selectbox("Select Location:", options=get_locations())
 hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
 
-# Call the recommendation function based on selected algorithm
-if algorithm == "Hashtag-Based":
-    recommendations = recommend_posts_hashtag(location, hashtags)
-else:
-    recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
+# Display the recommendation button
+if st.button("Recommend"):
+    # Call the recommendation function based on selected algorithm
+    if algorithm == "Hashtag-Based":
+        recommendations = recommend_posts_hashtag(location, hashtags)
+    else:
+        recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-# Check if recommendations are available
-if not recommendations.empty:
-    st.subheader("Recommendations:")
-    num_recommendations = len(recommendations)
-    num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-    for i in range(num_rows):
-        row_html = "<div style='display:flex;'>"
-        for j in range(3):
-            index = i * 3 + j
-            if index < num_recommendations:
-                recommendation = recommendations.iloc[index]
-                # Display the image from GitHub repository using the provided URL
-                image_url = recommendation['image_url']
-                # Modify the URL to the correct format
-                full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
+    # Check if recommendations are available
+    if not recommendations.empty:
+        st.subheader("Recommendations:")
+        num_recommendations = len(recommendations)
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
+        for i in range(num_rows):
+            row_html = "<div style='display:flex;'>"
+            for j in range(3):
+                index = i * 3 + j
+                if index < num_recommendations:
+                    recommendation = recommendations.iloc[index]
+                    # Display the image from GitHub repository using the provided URL
+                    image_url = recommendation['image_url']
+                    # Modify the URL to the correct format
+                    full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
 
-                try:
-                    response = requests.get(full_image_url)
-                    if Image.isImageType(response.content):
-                        img = Image.open(BytesIO(response.content))
-                        # Resize the image to 250x250
-                        img = img.resize((250, 250))
-                        st.subheader(recommendation['image_title'])
-                        st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
-                except Exception as e:
-                    st.write(f"Error loading image from URL: {full_image_url}")
-                    st.write(e)
+                    try:
+                        response = requests.get(full_image_url)
+                        if Image.isImageType(response.content):
+                            img = Image.open(BytesIO(response.content))
+                            # Resize the image to 250x250
+                            img = img.resize((250, 250))
+                            st.subheader(recommendation['image_title'])
+                            st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
+                    except Exception as e:
+                        st.write(f"Error loading image from URL: {full_image_url}")
+                        st.write(e)
 
-        row_html += "</div>"
-        st.html(row_html)
-else:
-    st.write("No recommendations found based on your input.")
-
-st.stop()
+            row_html += "</div>"
+            st.html(row_html)
+    else:
+        st.write("No recommendations found based on your input.")

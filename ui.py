@@ -100,7 +100,7 @@ if st.button("Recommend"):
                         if response.status_code == 200:
                             # Display the image with title above
                             st.markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
-                            st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", use_column_width=True)
+                            st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}", width=200)
 
                             # Display location and hashtags in small boxes
                             st.markdown(f"<div style='display:flex; margin-top: 5px; justify-content: center;'>"

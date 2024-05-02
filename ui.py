@@ -98,10 +98,8 @@ if st.button("Recommend"):
                     try:
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
-                            # Load the image using PIL
-                            img = Image.open(BytesIO(response.content))
                             # Display the image
-                            st.image(img, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
+                            st.image(full_image_url, caption=f"Location: {recommendation['location']}\nHashtag: #{recommendation['hashtag']}\nSimilarity Score: {recommendation['score']}", use_column_width=True)
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)

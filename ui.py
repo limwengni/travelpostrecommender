@@ -68,7 +68,7 @@ if st.button("Recommend"):
     else:
         recommendations = recommend_posts_knn(location, hashtags[0])  # Using the first hashtag for KNN
 
-    if recommendations:
+    if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
         num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
@@ -116,5 +116,5 @@ if st.button("Recommend"):
             st.html(row_html)
     else:
         st.write("No recommendations found based on your input.")
-        
+
 st.stop()

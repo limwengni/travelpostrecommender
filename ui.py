@@ -50,6 +50,7 @@ def recommend_posts_knn(location, hashtag):
     distances, indices = knn.kneighbors(encoded_user_input)
 
     recommendations = travel_posts.iloc[indices[0]].reset_index(drop=True)
+    recommendations['score'] = 1 / (1 + distances[0])  # Adding score column
     return recommendations
 
 def image_to_base64(image):

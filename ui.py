@@ -73,7 +73,7 @@ hashtags = st.multiselect("Select Hashtags:", options=get_hashtags())
 
 # Display the recommendation button
 if st.button("Recommend"):
-    # Call the recommendation function based on the selected algorithm
+    # Call the recommendation function based on selected algorithm
     if algorithm == "Hashtag-Based":
         recommendations = recommend_posts_hashtag(location, hashtags)
     else:
@@ -83,16 +83,11 @@ if st.button("Recommend"):
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_columns = 3
-        num_rows = (num_recommendations + num_columns - 1) // num_columns  # Calculate number of rows needed
-
-        image_width = 200  # Width of the square image
-        image_height = 200  # Height of the square image
-
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            cols = st.columns(num_columns)
-            for j in range(num_columns):
-                index = i * num_columns + j
+            row_html = "<div style='display:flex; justify-content:center;'>"
+            for j in range(3):
+                index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations.iloc[index]
                     # Display the image from GitHub repository using the provided URL
@@ -104,19 +99,21 @@ if st.button("Recommend"):
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
                             # Display the image with title above
-                            cols[j].markdown(f"<div style='text-align:center'><h4 style='font-size:14px;'>{recommendation['image_title']}</h4></div>", unsafe_allow_html=True)
-                            cols[j].image(full_image_url, width=image_width, caption=f"Similarity Score: {recommendation['score']}",
-                                          use_column_width=False)
+                            st.markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
+                            st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}")
 
                             # Display location and hashtags in small boxes
-                            cols[j].markdown(f"<div style='text-align:center; margin-top: 5px;'>"
-                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-bottom: 10px; width: 150px; display:inline-block; font-size:12px;'>{recommendation['location']}</div>"
-                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; display:inline-block; font-size:12px;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
+                            st.markdown(f"<div style='text-align:center; margin-top: 5px;'>"
+                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 10px; width: 150px; display:inline-block;'>{recommendation['location']}</div>"
+                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; display:inline-block;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
                                         f"</div>", unsafe_allow_html=True)
 
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
+
+            row_html += "</div>"
+            st.markdown(row_html, unsafe_allow_html=True)
 
     else:
         st.write("No recommendations found based on your input.")

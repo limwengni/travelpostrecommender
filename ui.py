@@ -86,6 +86,9 @@ if st.button("Recommend"):
         num_columns = 3
         num_rows = (num_recommendations + num_columns - 1) // num_columns  # Calculate number of rows needed
 
+        image_width = 200  # Width of the square image
+        image_height = 200  # Height of the square image
+
         for i in range(num_rows):
             cols = st.columns(num_columns)
             for j in range(num_columns):
@@ -102,7 +105,8 @@ if st.button("Recommend"):
                         if response.status_code == 200:
                             # Display the image with title above
                             cols[j].markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
-                            cols[j].image(full_image_url, width=200, caption=f"Similarity Score: {recommendation['score']}")
+                            cols[j].image(full_image_url, width=image_width, caption=f"Similarity Score: {recommendation['score']}",
+                                          use_column_width=False)
 
                             # Display location and hashtags in small boxes
                             cols[j].markdown(f"<div style='text-align:center; margin-top: 5px;'>"

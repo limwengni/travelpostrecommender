@@ -83,12 +83,11 @@ if st.button("Recommend"):
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 1) // 2  # Calculate number of rows needed
-
+        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
         for i in range(num_rows):
-            cols = st.columns(2)
-            for j in range(2):
-                index = i * 2 + j
+            row_html = "<div style='display:flex; justify-content:center;'>"
+            for j in range(3):
+                index = i * 3 + j
                 if index < num_recommendations:
                     recommendation = recommendations.iloc[index]
                     # Display the image from GitHub repository using the provided URL
@@ -100,12 +99,11 @@ if st.button("Recommend"):
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
                             # Display the image with title above
-                            cols[j].markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
-                            cols[j].image(full_image_url, caption=f"Similarity Score: {recommendation['score']}",
-                                          use_column_width=False)
+                            st.markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
+                            st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}")
 
                             # Display location and hashtags in small boxes
-                            cols[j].markdown(f"<div style='text-align:center; margin-top: 5px;'>"
+                            st.markdown(f"<div style='text-align:center; margin-top: 5px;'>"
                                         f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 10px; width: 150px; display:inline-block;'>{recommendation['location']}</div>"
                                         f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; display:inline-block;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
                                         f"</div>", unsafe_allow_html=True)
@@ -113,6 +111,9 @@ if st.button("Recommend"):
                     except Exception as e:
                         st.write(f"Error loading image from URL: {full_image_url}")
                         st.write(e)
+
+            row_html += "</div>"
+            st.markdown(row_html, unsafe_allow_html=True)
 
     else:
         st.write("No recommendations found based on your input.")

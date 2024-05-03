@@ -68,8 +68,8 @@ def resize_image(image_url, size):
         if response.status_code == 200:
             # Open the image from URL
             image = Image.open(BytesIO(response.content))
-            # Resize the image to square without cropping
-            image.thumbnail((size, size), Image.ANTIALIAS)
+            # Resize the image to square without cropping using Lanczos filter
+            image = image.resize((size, size), Image.LANCZOS)
             return image
         else:
             return None

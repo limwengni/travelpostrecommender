@@ -62,22 +62,6 @@ def image_to_base64(image):
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
-def resize_image(image_url, size):
-    try:
-        response = requests.get(image_url)
-        if response.status_code == 200:
-            # Open the image from URL
-            image = Image.open(BytesIO(response.content))
-            # Resize the image to square without cropping using Lanczos filter
-            image = image.resize((size, size), Image.LANCZOS)
-            return image
-        else:
-            return None
-    except Exception as e:
-        st.write(f"Error resizing image from URL: {image_url}")
-        st.write(e)
-        return None
-
 st.title("Travel Recommendation App")
 
 # Select recommendation algorithm
@@ -113,12 +97,11 @@ if st.button("Recommend"):
                     full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
 
                     try:
-                        resized_image = resize_image(full_image_url, 200)  # Resize image to 200x200
-                        if resized_image is not None:
+                        response = requests.get(full_image_url)
+                        if response.status_code == 200:
                             # Display the image with title above
                             cols[j].markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
-                            cols[j].image(resized_image, caption=f"Similarity Score: {recommendation['score']}",
-                                          use_column_width=False)
+                            cols[j].image(full_image_url, caption=f"Similarity Score: {recommendation['score']}")
 
                             # Display location and hashtags in small boxes
                             cols[j].markdown(f"<div style='text-align:center; margin-top: 5px;'>"

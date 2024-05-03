@@ -104,14 +104,14 @@ if st.button("Recommend"):
                         response = requests.get(full_image_url)
                         if response.status_code == 200:
                             # Display the image with title above
-                            cols[j].markdown(f"<div style='text-align:center'><h4>{recommendation['image_title']}</h4></div>", unsafe_allow_html=True)
+                            cols[j].markdown(f"<div style='text-align:center'><h4 style='font-size:14px;'>{recommendation['image_title']}</h4></div>", unsafe_allow_html=True)
                             cols[j].image(full_image_url, width=image_width, caption=f"Similarity Score: {recommendation['score']}",
                                           use_column_width=False)
 
                             # Display location and hashtags in small boxes
                             cols[j].markdown(f"<div style='text-align:center; margin-top: 5px;'>"
-                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-bottom: 10px; width: 150px; display:inline-block;'>{recommendation['location']}</div>"
-                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; display:inline-block;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
+                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-bottom: 10px; width: 150px; display:inline-block; font-size:12px;'>{recommendation['location']}</div>"
+                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; display:inline-block; font-size:12px;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
                                         f"</div>", unsafe_allow_html=True)
 
                     except Exception as e:

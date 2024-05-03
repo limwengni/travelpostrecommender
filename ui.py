@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
-import requests
 from PIL import Image
+import requests
 from io import BytesIO
 import base64
-from sklearn.neighbors import NearestNeighbors
-from sklearn.preprocessing import OneHotEncoder
+import os
+import tempfile
 
 # Load travel posts data from CSV
 travel_posts = pd.read_csv("image_dataset.csv", encoding='latin1')
@@ -62,6 +62,47 @@ def image_to_base64(image):
     # Convert the encoded bytes to a string
     return encoded_img.decode('utf-8')
 
+def crop_image(image, crop_box):
+    width, height = image.size
+    left, top, right, bottom = crop_box
+
+    # Convert percentage to pixels
+    left = int(left * width)
+    top = int(top * height)
+    right = int(right * width)
+    bottom = int(bottom * height)
+
+    # Crop image
+    cropped_image = image.crop((left, top, right, bottom))
+    return cropped_image
+
+def display_cropped_image(image, crop_box):
+    cropped_image = crop_image(image, crop_box)
+    st.image(cropped_image, caption="Cropped Image", use_column_width=True)
+
+def get_cropped_image(image_url, crop_box):
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        image = Image.open(BytesIO(response.content))
+        cropped_image = crop_image(image, crop_box)
+        return cropped_image
+    else:
+        return None
+
+def save_cropped_image(image_url, crop_box):
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        image = Image.open(BytesIO(response.content))
+        cropped_image = crop_image(image, crop_box)
+
+        # Save cropped image
+        temp_dir = tempfile.mkdtemp()
+        temp_file_path = os.path.join(temp_dir, "cropped_image.jpg")
+        cropped_image.save(temp_file_path)
+        return temp_file_path
+    else:
+        return None
+
 st.title("Travel Recommendation App")
 
 # Select recommendation algorithm
@@ -83,37 +124,62 @@ if st.button("Recommend"):
     if not recommendations.empty:
         st.subheader("Recommendations:")
         num_recommendations = len(recommendations)
-        num_rows = (num_recommendations + 2) // 3  # Calculate number of rows needed
-        for i in range(num_rows):
-            row_html = "<div style='display:flex; justify-content:center;'>"
-            for j in range(3):
-                index = i * 3 + j
-                if index < num_recommendations:
-                    recommendation = recommendations.iloc[index]
-                    # Display the image from GitHub repository using the provided URL
-                    image_url = recommendation['image_url']
-                    # Modify the URL to the correct format
-                    full_image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{image_url}"
 
-                    try:
-                        response = requests.get(full_image_url)
-                        if response.status_code == 200:
-                            # Display the image with title above
-                            st.markdown(f"<div style='text-align:center'><h2>{recommendation['image_title']}</h2></div>", unsafe_allow_html=True)
-                            st.image(full_image_url, caption=f"Similarity Score: {recommendation['score']}")
+        for index, recommendation in recommendations.iterrows():
+            st.markdown(f"## {recommendation['image_title']}")
+            st.write(f"Location: {recommendation['location']}")
+            st.write(f"Hashtags: {recommendation['hashtag']}")
 
-                            # Display location and hashtags in small boxes
-                            st.markdown(f"<div style='text-align:center; margin-top: 5px;'>"
-                                        f"<div style='background-color: lightblue; padding: 5px; border-radius: 5px; margin-right: 10px; width: 150px; display:inline-block;'>{recommendation['location']}</div>"
-                                        f"<div style='background-color: lightgreen; padding: 5px; border-radius: 5px; width: 150px; display:inline-block;'>{' '.join(['#' + tag for tag in recommendation['hashtag'].split(', ')])}</div>"
-                                        f"</div>", unsafe_allow_html=True)
+            # Display the image from GitHub repository using the provided URL
+            image_url = f"https://github.com/limwengni/travelpostrecommender/raw/main/{recommendation['image_url']}"
+            response = requests.get(image_url)
+            if response.status_code == 200:
+                image = Image.open(BytesIO(response.content))
+                st.image(image, caption="Original Image", use_column_width=True)
 
-                    except Exception as e:
-                        st.write(f"Error loading image from URL: {full_image_url}")
-                        st.write(e)
+                # Cropper.js for interactive image cropping
+                st.write("<h3>Crop Image</h3>", unsafe_allow_html=True)
+                st.write(
+                    f'<img id="cropped-image" src="{image_url}" alt="Original Image">'
+                    '<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>'
+                    '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">'
+                    '<script>'
+                    'window.addEventListener("DOMContentLoaded", () => {'
+                    'const image = document.getElementById("cropped-image");'
+                    'const cropper = new Cropper(image, {'
+                    'aspectRatio: 1 / 1,'
+                    'crop(event) {'
+                    'const cropData = cropper.getData();'
+                    'const cropBoxData = cropper.getCropBoxData();'
+                    'const message = `Crop area: ${cropData.width}px × ${cropData.height}px`;'
+                    'const cropBoxMessage = `Crop box size: ${cropBoxData.width}px × ${cropBoxData.height}px`;'
+                    'console.log(message);'
+                    'console.log(cropBoxMessage);'
+                    'window.parent.postMessage(cropData, "*");'
+                    'window.parent.postMessage(cropBoxData, "*");'
+                    '},'
+                    '});'
+                    '});'
+                    '</script>',
+                    unsafe_allow_html=True
+                )
 
-            row_html += "</div>"
-            st.markdown(row_html, unsafe_allow_html=True)
+                crop_box_data = st.experimental_get_query_params()["cropData"]
+                crop_box = (crop_box_data["left"], crop_box_data["top"], crop_box_data["width"], crop_box_data["height"])
+
+                # Display the cropped image
+                cropped_image = get_cropped_image(image_url, crop_box)
+                if cropped_image:
+                    st.image(cropped_image, caption="Cropped Image", use_column_width=True)
+                    # Save the cropped image
+                    save_button = st.button("Save Cropped Image")
+                    if save_button:
+                        temp_file_path = save_cropped_image(image_url, crop_box)
+                        st.success(f"Saved cropped image to: {temp_file_path}")
+                else:
+                    st.warning("Failed to crop the image.")
+            else:
+                st.warning(f"Failed to load the image from URL: {image_url}")
 
     else:
         st.write("No recommendations found based on your input.")
